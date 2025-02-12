@@ -19,10 +19,10 @@ public class PostgreSQLStatementBuilder {
 
     public static PreparedStatement getProjectWithMilestoneList(Connection conn) throws SQLException {
         return conn.prepareStatement(
-                "SELECT P.code as ProjectCode, P.description as ProjectDescription, " +
-                    "  P.startingDate as ProjectStartingDate, P.endingDate as ProjectEndingDate," +
-                    "  P.status as ProjectStatus, M.code as Milestone, M.startingDate as MilestoneStartingDate," +
-                    "  M.endingDate as MilestoneEndingDate, M.critical as Critical " +
+                "SELECT P.code as projectCode, P.description as projectDescription, " +
+                    "  P.startingDate as projectStartingDate, P.endingDate as projectEndingDate," +
+                    "  P.status as projectStatus, M.code as milestone, M.startingDate as milestoneStartingDate," +
+                    "  M.endingDate as milestoneEndingDate, M.critical as critical " +
                     "FROM Milestone M " +
                     "JOIN Project P ON M.project = P.code;"
         );
