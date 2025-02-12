@@ -204,7 +204,7 @@ BEGIN
 		(NEW.employeeId IN (SELECT employeeId FROM MidDeveloper)) OR 
 		(NEW.employeeId IN (SELECT employeeId FROM SeniorDeveloper))
 	) THEN
-		RAISE EXCEPTION 'Developer completeness constraint is not fulfilled.';
+		RAISE EXCEPTION 'Developer completeness constraint is not fulfilled for employeeId %.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -227,7 +227,7 @@ BEGIN
 		(NEW.employeeId IN (SELECT employeeId FROM MidDeveloper)) OR
 		(NEW.employeeId IN (SELECT employeeId FROM SeniorDeveloper))
 	) THEN
-		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled.';
+		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled for employeeId %.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -246,7 +246,7 @@ BEGIN
 		(NEW.employeeId IN (SELECT employeeId FROM JuniorDeveloper)) OR
 		(NEW.employeeId IN (SELECT employeeId FROM SeniorDeveloper))
 	) THEN
-		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled.';
+		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled for employeeId %.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -265,7 +265,7 @@ BEGIN
 		(NEW.employeeId IN (SELECT employeeId FROM JuniorDeveloper)) OR
 		(NEW.employeeId IN (SELECT employeeId FROM MidDeveloper))
 	) THEN
-		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled.';
+		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled for employeeId %.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -289,7 +289,7 @@ BEGIN
 		(NEW.taskId IN (SELECT taskId FROM FeatureTask)) OR 
 		(NEW.taskId IN (SELECT taskId FROM CodeReviewTask)) 
 	) THEN
-		RAISE EXCEPTION 'Task completeness constraint is not fulfilled.';
+		RAISE EXCEPTION 'Task completeness constraint is not fulfilled for taskId %.', NEW.taskId;
 	END IF;
 	RETURN NEW;
 END;
@@ -312,7 +312,7 @@ BEGIN
         (NEW.taskId IN (SELECT taskId FROM FeatureTask)) OR
         (NEW.taskId IN (SELECT taskId FROM CodeReviewTask))
     ) THEN
-        RAISE EXCEPTION 'Task disjointness constraint is not fulfilled.';
+        RAISE EXCEPTION 'Task disjointness constraint is not fulfilled for taskId %.', NEW.taskId;
     END IF;
     RETURN NEW;
 END;
@@ -331,7 +331,7 @@ BEGIN
         (NEW.taskId IN (SELECT taskId FROM BugfixTask)) OR
         (NEW.taskId IN (SELECT taskId FROM CodeReviewTask))
     ) THEN
-        RAISE EXCEPTION 'Task disjointness constraint is not fulfilled.';
+        RAISE EXCEPTION 'Task disjointness constraint is not fulfilled for taskId %.', NEW.taskId;
     END IF;
     RETURN NEW;
 END;
@@ -350,7 +350,7 @@ BEGIN
         (NEW.taskId IN (SELECT taskId FROM BugfixTask)) OR
         (NEW.taskId IN (SELECT taskId FROM FeatureTask))
     ) THEN
-        RAISE EXCEPTION 'Task disjointness constraint is not fulfilled.';
+        RAISE EXCEPTION 'Task disjointness constraint is not fulfilled for taskId %.', NEW.taskId;
     END IF;
     RETURN NEW;
 END;
@@ -397,7 +397,7 @@ BEGIN
           AND Project.startingDate <= NEW.startingDate
           AND Project.endingDate >= NEW.endingDate
     ) THEN
-        RAISE EXCEPTION 'No corresponding project with overlapping dates found for milestone.';
+        RAISE EXCEPTION 'No corresponding project with overlapping dates found for milestone % %.', NEW.project, NEW.code;
     END IF;
     RETURN NEW;
 END;
