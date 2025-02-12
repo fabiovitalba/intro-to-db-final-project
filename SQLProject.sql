@@ -61,6 +61,9 @@ CREATE TABLE Milestone(
     critical BOOLEAN NOT NULL,
     PRIMARY KEY (project,code),
     FOREIGN KEY (project) REFERENCES Project(code)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE Task(
@@ -75,8 +78,14 @@ CREATE TABLE Task(
     milestone VARCHAR(20) NOT NULL,
     assignedDeveloper INT,
     PRIMARY KEY (taskId),
-    FOREIGN KEY (project, milestone) REFERENCES Milestone(project, code),
+    FOREIGN KEY (project, milestone) REFERENCES Milestone(project, code)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (assignedDeveloper) REFERENCES Developer(employeeId)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE BugfixTask(
@@ -84,6 +93,9 @@ CREATE TABLE BugfixTask(
     impact VARCHAR(6) NOT NULL,
     PRIMARY KEY (taskId),
     FOREIGN KEY (taskId) REFERENCES Task(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE FeatureTask(
@@ -91,36 +103,54 @@ CREATE TABLE FeatureTask(
     complexity VARCHAR(6) NOT NULL,
     PRIMARY KEY (taskId),
     FOREIGN KEY (taskId) REFERENCES Task(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE CodeReviewTask(
 	taskId INT,
     PRIMARY KEY (taskId),
     FOREIGN KEY (taskId) REFERENCES Task(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE JuniorDeveloper(
 	employeeId INT,
     PRIMARY KEY (employeeId),
     FOREIGN KEY (employeeId) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE MidDeveloper(
 	employeeId INT,
     PRIMARY KEY (employeeId),
     FOREIGN KEY (employeeId) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE SeniorDeveloper(
 	employeeId INT,
     PRIMARY KEY (employeeId),
     FOREIGN KEY (employeeId) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE LeadDeveloper(
 	employeeId INT,
     PRIMARY KEY (employeeId),
     FOREIGN KEY (employeeId) REFERENCES SeniorDeveloper(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE TimeLog(
@@ -132,8 +162,14 @@ CREATE TABLE TimeLog(
     endingTime TIME NOT NULL,
     timeWorkedHrs DECIMAL NOT NULL,
     PRIMARY KEY (developer, task, startDate, startTime),
-    FOREIGN KEY (developer) REFERENCES Developer(employeeId),
+    FOREIGN KEY (developer) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (task) REFERENCES Task(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE DueDateChange(
@@ -146,16 +182,28 @@ CREATE TABLE DueDateChange(
     timeWorkedUntilNowHrs DECIMAL,
     currentEstimateHrs DECIMAL,
     PRIMARY KEY (developer, task, dateChanged, oldDueDate, newDueDate),
-    FOREIGN KEY (developer) REFERENCES Developer(employeeId),
+    FOREIGN KEY (developer) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (task) REFERENCES Task(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE Orders(
 	project VARCHAR(20),
     customer VARCHAR(15),
     PRIMARY KEY (project, customer),
-    FOREIGN KEY (project) REFERENCES Project(code),
+    FOREIGN KEY (project) REFERENCES Project(code)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (customer) REFERENCES Customer(vatRegNo)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE Estimates(
@@ -164,8 +212,14 @@ CREATE TABLE Estimates(
     estimatedEffortHrs INT NOT NULL,
     estimationDate DATE NOT NULL,
     PRIMARY KEY (task),
-    FOREIGN KEY (task) REFERENCES Task(taskId),
+    FOREIGN KEY (task) REFERENCES Task(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (developer) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE Reviews(
@@ -173,24 +227,42 @@ CREATE TABLE Reviews(
     codeReviewTask INT,
     result VARCHAR(8) NOT NULL,
     PRIMARY KEY (developer, codeReviewTask),
-    FOREIGN KEY (developer) REFERENCES Developer(employeeId),
+    FOREIGN KEY (developer) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (codeReviewTask) REFERENCES CodeReviewTask(taskId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE HasSkill(
 	developer INT,
     skill VARCHAR(50),
     PRIMARY KEY (developer, skill),
-    FOREIGN KEY (developer) REFERENCES Developer(employeeId),
+    FOREIGN KEY (developer) REFERENCES Developer(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (skill) REFERENCES Skill(name)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 CREATE TABLE Techleads(
 	project VARCHAR(20),
     leadDeveloper INT NOT NULL,
     PRIMARY KEY (project),
-    FOREIGN KEY (project) REFERENCES Project(code),
+    FOREIGN KEY (project) REFERENCES Project(code)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED,
     FOREIGN KEY (leadDeveloper) REFERENCES LeadDeveloper(employeeId)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+    DEFERRABLE INITIALLY DEFERRED
 );
 
 
