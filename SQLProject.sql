@@ -258,12 +258,6 @@ ON MidDeveloper
 FOR EACH ROW
 EXECUTE FUNCTION MidDeveloperCheckDisjointness();
 
-CREATE TRIGGER JuniorDeveloperOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
-ON JuniorDeveloper
-FOR EACH ROW
-EXECUTE FUNCTION JuniorDeveloperCheckDisjointness();
-
 CREATE OR REPLACE FUNCTION SeniorDeveloperCheckDisjointness()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -293,7 +287,7 @@ BEGIN
 	IF NOT (
 		(NEW.taskId IN (SELECT taskId FROM BugfixTask)) OR 
 		(NEW.taskId IN (SELECT taskId FROM FeatureTask)) OR 
-		(NEW.taskId IN (SELECT taskId FROM CodeReviewTask)) OR 
+		(NEW.taskId IN (SELECT taskId FROM CodeReviewTask)) 
 	) THEN
 		RAISE EXCEPTION 'Task completeness constraint is not fulfilled.';
 	END IF;
@@ -409,7 +403,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger
+CREATE TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger2
 BEFORE INSERT OR UPDATE
 ON Milestone
 FOR EACH ROW
