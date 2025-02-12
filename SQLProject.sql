@@ -210,9 +210,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER DeveloperOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER DeveloperOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON Developer
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION DeveloperCheckCompleteness();
 -- <<< Developer Completeness Constraint <<<
@@ -233,9 +234,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER JuniorDeveloperOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER JuniorDeveloperOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON JuniorDeveloper
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION JuniorDeveloperCheckDisjointness();
 
@@ -252,9 +254,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER MidDeveloperOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER MidDeveloperOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON MidDeveloper
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION MidDeveloperCheckDisjointness();
 
@@ -271,9 +274,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER SeniorDeveloperOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER SeniorDeveloperOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON MidDeveloper
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION SeniorDeveloperCheckDisjointness();
 -- <<< Developer Disjointness Constraint <<<
@@ -295,9 +299,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER TaskOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER TaskOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON Task
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION TaskCheckCompleteness();
 -- <<< Task Completeness Constraint <<<
@@ -318,9 +323,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER BugfixTaskOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER BugfixTaskOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON BugfixTask
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION BugfixTaskCheckDisjointness();
 
@@ -337,9 +343,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER FeatureTaskOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER FeatureTaskOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON FeatureTask
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION FeatureTaskCheckDisjointness();
 
@@ -356,9 +363,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER CodeReviewTaskOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER CodeReviewTaskOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON CodeReviewTask
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CodeReviewTaskCheckDisjointness();
 -- <<< Task Disjointness Constraint <<<
@@ -374,15 +382,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER ProjectOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER ProjectOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON Project
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckDates();
 
-CREATE TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
 ON Milestone
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckDates();
 
@@ -403,9 +413,10 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger2
-BEFORE INSERT OR UPDATE
+CREATE CONSTRAINT TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger2
+AFTER INSERT OR UPDATE
 ON Milestone
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION MilestoneCheckProjectDates();
 -- <<< External Constraints <<<
