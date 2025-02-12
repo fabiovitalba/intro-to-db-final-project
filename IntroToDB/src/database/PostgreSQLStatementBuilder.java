@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class PostgreSQLStatementBuilder {
+    private PostgreSQLStatementBuilder() {}
+
     public static PreparedStatement getDeveloperListStatement(Connection conn) throws SQLException {
         return conn.prepareStatement(
                 "SELECT * FROM Developer;"

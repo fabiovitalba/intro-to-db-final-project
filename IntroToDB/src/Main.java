@@ -1,5 +1,6 @@
 import database.PostgreSQLConnector;
 import database.PostgreSQLStatementBuilder;
+import view.TerminalOutputManager;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -13,7 +14,7 @@ public class Main {
             Connection conn = PostgreSQLConnector.openConnection();
             while(!exitProgram && conn.isValid(timeout)) {
                 System.out.println("Project Task management for IT Company.");
-                printActivityMenu();
+                TerminalOutputManager.printActivityMenu();
                 System.out.println("Please select the activity to perform:");
                 String selActivity = scan.next();
                 int activity = Integer.parseInt(selActivity);
@@ -57,25 +58,10 @@ public class Main {
             }
             conn.close();
         } catch (ClassNotFoundException e) {
-            printErrorWithStackTrace("PostgreSQL Driver could not be loaded. Error:", e);
+            TerminalOutputManager.printErrorWithStackTrace("PostgreSQL Driver could not be loaded. Error:", e);
         } catch (SQLException e) {
-            printErrorWithStackTrace("Database Connection could not be established. Error:", e);
+            TerminalOutputManager.printErrorWithStackTrace("Database Connection could not be established. Error:", e);
         }
-    }
-
-    private static void printActivityMenu() {
-        System.out.println("1) Create a Task");
-        System.out.println("2) Create a Developer");
-        System.out.println("3) Assign a Task to a Developer");
-        System.out.println("4) Find overdue Tasks in a Project");
-        System.out.println("5) Assign a period of time as worked time to a Task of a Developer");
-        System.out.println("6) Find all Tasks without estimate in a Project");
-        System.out.println("7) Find all assigned, workable Tasks for the current week for all Developers");
-        System.out.println("8) List all Developers");
-        System.out.println("9) List all Tasks");
-        System.out.println("10) List all Projects with Milestones");
-        System.out.println("-------------------------------------");
-        System.out.println("99) Exit application");
     }
 
     private static void createATaskActivity(Connection conn) {
@@ -110,9 +96,9 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getDeveloperListStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
-            printResultSet(resultSet);
+            TerminalOutputManager.printResultSet(resultSet);
         } catch (SQLException e) {
-            printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalOutputManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
     }
 
@@ -120,9 +106,9 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getTaskListStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
-            printResultSet(resultSet);
+            TerminalOutputManager.printResultSet(resultSet);
         } catch (SQLException e) {
-            printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalOutputManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
     }
 
@@ -130,40 +116,9 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getProjectWithMilestoneList(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
-            printResultSet(resultSet);
+            TerminalOutputManager.printResultSet(resultSet);
         } catch (SQLException e) {
-            printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalOutputManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
-    }
-
-    private static void printErrorWithStackTrace(String errorMessage, Exception e) {
-        System.out.println(errorMessage + " " + e.getMessage());
-        e.printStackTrace();
-    }
-
-    private static void printResultSet(ResultSet resultSet) throws SQLException {
-        ResultSetMetaData rsMetaData = resultSet.getMetaData();
-        int noOfColumns = rsMetaData.getColumnCount();
-
-        System.out.println();
-        // Column Captions
-        for (int i = 1; i <= noOfColumns; i++) {
-            System.out.print("|");
-            System.out.print(padTableCell(rsMetaData.getColumnLabel(i), rsMetaData.getColumnDisplaySize(i) + 1));
-        }
-        System.out.println("|");
-
-        // Table Rows
-        while(resultSet.next()) {
-            for (int i = 1; i <= noOfColumns; i++) {
-                System.out.print("|");
-                System.out.print(padTableCell(resultSet.getString(i), rsMetaData.getColumnDisplaySize(i) + 1));
-            }
-            System.out.println("|");
-        }
-    }
-
-    private static String padTableCell(String cellValue, int width) {
-        return String.format(" %1$-" + width + "s ", cellValue);
     }
 }

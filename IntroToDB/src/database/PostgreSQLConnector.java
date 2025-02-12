@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class PostgreSQLConnector {
+    private PostgreSQLConnector() {}
+
     private static String servername = "localhost";
     private static Integer port = 5432;
     private static String database = "introToDb";
