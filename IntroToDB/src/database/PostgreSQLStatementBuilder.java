@@ -7,6 +7,38 @@ import java.sql.SQLException;
 public class PostgreSQLStatementBuilder {
     private PostgreSQLStatementBuilder() {}
 
+    public static PreparedStatement getOverdueTasksInProject(Connection conn) throws  SQLException {
+        return conn.prepareStatement(
+                "SELECT T.taskId, T.description, T.assignedDeveloper, T.dueDate, T.status " +
+                "FROM Task T " +
+                "WHERE (T.project = ?) AND " +
+                    "(T.dueDate < ?) AND " +
+                    "(T.status in ('authorized','in progress','test'));"
+        );
+    }
+
+    public static PreparedStatement getOverdueTasksWithProgressInProject(Connection conn) throws  SQLException {
+        return conn.prepareStatement(
+                "SELECT TWP.taskId, TWP.description, D.name, TWP.dueDate, TWP.status, TWP.workedHrs, " +
+                        "TWP.estimateHrs, TWP.progressPerc " +
+                    "FROM ( " +
+                        "SELECT T.taskId, T.description, T.assignedDeveloper, T.dueDate, T.status, " +
+                            "SUM(TL.timeWorkedHrs) as workedHrs, SUM(E.estimatedEffortHrs) as estimateHrs, " +
+                            "ROUND((SUM(TL.timeWorkedHrs)/SUM(E.estimatedEffortHrs))*100,2) as progressPerc " +
+                        "FROM Task T " +
+                        "LEFT JOIN TimeLog TL ON TL.task = T.taskId " +
+                        "LEFT JOIN Estimates E ON E.task = T.taskId " +
+                        "WHERE (T.project = ?) AND " +
+                            "(T.dueDate < ?) AND " +
+                            "(T.status in ('authorized','in progress','test')) " +
+                        "GROUP BY T.taskId" +
+                    ") TWP " +
+                    "LEFT JOIN Developer D ON TWP.assignedDeveloper = D.employeeId;"
+        );
+    }
+
+    // TODO
+
     public static PreparedStatement getUnestimatedTasksForProject(Connection conn) throws SQLException {
         return conn.prepareStatement(
                 "SELECT T.project, T.taskId, T.description, T.status, T.creationDate, T.dueDate " +

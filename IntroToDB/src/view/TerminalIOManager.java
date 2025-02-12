@@ -22,14 +22,16 @@ public class TerminalIOManager {
         System.out.println("2) Create a Developer");
         System.out.println("3) Assign a Task to a Developer");
         System.out.println("4) Find overdue Tasks in a Project");
-        System.out.println("5) Assign a period of time as worked time to a Task of a Developer");
-        System.out.println("6) Find all Tasks without estimate in a Project");
-        System.out.println("7) Find all assigned, workable Tasks for the current week for all Developers");
-        System.out.println("8) List all Developers");
-        System.out.println("9) List all Tasks");
-        System.out.println("10) List all Projects with Milestones");
+        System.out.println("5) Find overdue Tasks in a Project (w/ Progress)");
+        System.out.println("6) Assign a period of time as worked time to a Task of a Developer");
+        System.out.println("7) Find all Tasks without estimate in a Project");
+        System.out.println("8) Find all assigned, workable Tasks for the current week for all Developers");
+        System.out.println("9) List all Developers");
+        System.out.println("10) List all Tasks");
+        System.out.println("11) List all Projects with Milestones");
         System.out.println("-------------------------------------");
         System.out.println("99) Exit application");
+        System.out.println();
     }
 
     public static void printError(String errorMessage) {
@@ -61,9 +63,17 @@ public class TerminalIOManager {
             }
             System.out.println("|");
         }
+        System.out.println();
+        System.out.println();
     }
 
     private static String padTableCell(String cellValue, int width) {
-        return String.format(" %1$-" + width + "s ", cellValue);
+        int localWidth = width;
+        if (localWidth > 50)
+            localWidth = 50;
+        String localCellValue = cellValue;
+        if (localCellValue.length() > localWidth)
+            localCellValue = localCellValue.substring(0,localWidth);
+        return String.format(" %1$-" + localWidth + "s ", localCellValue);
     }
 }

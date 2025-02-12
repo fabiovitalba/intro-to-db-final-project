@@ -3,6 +3,7 @@ import database.PostgreSQLStatementBuilder;
 import view.TerminalIOManager;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class Main {
@@ -31,21 +32,24 @@ public class Main {
                         findOverdueTasksActivity(conn, terminalIOManager);
                         break;
                     case 5:
-                        assignAPeriodOfTimeActivity(conn, terminalIOManager);
+                        findOverdueTasksWithProgressActivity(conn, terminalIOManager);
                         break;
                     case 6:
-                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
+                        assignAPeriodOfTimeActivity(conn, terminalIOManager);
                         break;
                     case 7:
-                        findAllAssignedWorkableTasksActivity(conn);
+                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
                         break;
                     case 8:
-                        listAllDevelopersActivity(conn);
+                        findAllAssignedWorkableTasksActivity(conn);
                         break;
                     case 9:
-                        listAllTasksActivity(conn);
+                        listAllDevelopersActivity(conn);
                         break;
                     case 10:
+                        listAllTasksActivity(conn);
+                        break;
+                    case 11:
                         listAllProjectsWithMilestonesActivity(conn);
                         break;
                     case 99:
@@ -76,7 +80,37 @@ public class Main {
     }
 
     private static void findOverdueTasksActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        String projectCode = terminalIOManager.askUserForString("Project code: ");
+        if (!projectCode.isEmpty()) {
+            try {
+                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksInProject(conn);
+                preparedStatement.setString(1, projectCode);
+                preparedStatement.setDate(2, Date.valueOf(LocalDate.now()));
+                ResultSet resultSet = preparedStatement.executeQuery();
+                TerminalIOManager.printResultSet(resultSet);
+            } catch (SQLException e) {
+                TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            }
+        } else {
+            TerminalIOManager.printError("Provided Project Code was empty.");
+        }
+    }
 
+    private static void findOverdueTasksWithProgressActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        String projectCode = terminalIOManager.askUserForString("Project code: ");
+        if (!projectCode.isEmpty()) {
+            try {
+                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksWithProgressInProject(conn);
+                preparedStatement.setString(1, projectCode);
+                preparedStatement.setDate(2, Date.valueOf(LocalDate.now()));
+                ResultSet resultSet = preparedStatement.executeQuery();
+                TerminalIOManager.printResultSet(resultSet);
+            } catch (SQLException e) {
+                TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            }
+        } else {
+            TerminalIOManager.printError("Provided Project Code was empty.");
+        }
     }
 
     private static void assignAPeriodOfTimeActivity(Connection conn, TerminalIOManager terminalIOManager) {
