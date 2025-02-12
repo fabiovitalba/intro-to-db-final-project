@@ -276,7 +276,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER SeniorDeveloperOnBeforeInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
-ON MidDeveloper
+ON SeniorDeveloper
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION SeniorDeveloperCheckDisjointness();
