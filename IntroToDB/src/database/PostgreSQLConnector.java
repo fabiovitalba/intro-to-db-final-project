@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class PostgreSQLConnector {
     private static String servername = "localhost";
     private static Integer port = 5432;
-    private static String database = "IntroToDB";
+    private static String database = "introToDb";
     private static String username = "postgres";
     private static String password = "postgres";
 

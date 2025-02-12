@@ -147,23 +147,23 @@ public class Main {
 
         System.out.println();
         // Column Captions
-        for (int i = 0; i < noOfColumns; i++) {
+        for (int i = 1; i <= noOfColumns; i++) {
             System.out.print("|");
-            System.out.print(padTableCell(rsMetaData.getColumnLabel(i),25));
+            System.out.print(padTableCell(rsMetaData.getColumnLabel(i), rsMetaData.getColumnDisplaySize(i) + 1));
         }
         System.out.println("|");
 
         // Table Rows
         while(resultSet.next()) {
-            for (int i = 0; i < noOfColumns; i++) {
+            for (int i = 1; i <= noOfColumns; i++) {
                 System.out.print("|");
-                System.out.print(padTableCell(resultSet.getString(i),25));
+                System.out.print(padTableCell(resultSet.getString(i), rsMetaData.getColumnDisplaySize(i) + 1));
             }
             System.out.println("|");
         }
     }
 
     private static String padTableCell(String cellValue, int width) {
-        return String.format("%1$-" + width + "s", cellValue);
+        return String.format(" %1$-" + width + "s ", cellValue);
     }
 }
