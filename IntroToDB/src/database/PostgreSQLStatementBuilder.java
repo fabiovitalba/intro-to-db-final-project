@@ -7,6 +7,26 @@ import java.sql.SQLException;
 public class PostgreSQLStatementBuilder {
     private PostgreSQLStatementBuilder() {}
 
+    public static PreparedStatement getUnestimatedTasksForProject(Connection conn) throws SQLException {
+        return conn.prepareStatement(
+                "SELECT T.project, T.taskId, T.description, T.status, T.creationDate, T.dueDate " +
+                    "FROM Task T " +
+                    "LEFT JOIN Estimates E ON E.task = T.taskId " +
+                    "WHERE (T.project = ?) AND " +
+                        " ((E.estimatedEffortHrs <= 0) OR (E.estimatedEffortHrs IS NULL));"
+        );
+    }
+
+    public static PreparedStatement getDeveloperWorkableTasksStatement(Connection conn) throws SQLException {
+        return conn.prepareStatement(
+                "SELECT D.name as developer, T.taskId, T.description, T.status, T.dueDate " +
+                    "FROM Developer D " +
+                    "JOIN Task T ON T.assignedDeveloper = D.employeeId " +
+                    "WHERE T.status in ('authorized','in progress') " +
+                    "ORDER BY D.name ASC, T.dueDate ASC"
+        );
+    }
+
     public static PreparedStatement getDeveloperListStatement(Connection conn) throws SQLException {
         return conn.prepareStatement(
                 "SELECT * FROM Developer;"

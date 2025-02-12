@@ -1,6 +1,6 @@
 import database.PostgreSQLConnector;
 import database.PostgreSQLStatementBuilder;
-import view.TerminalOutputManager;
+import view.TerminalIOManager;
 
 import java.sql.*;
 import java.util.Scanner;
@@ -10,32 +10,31 @@ public class Main {
         try {
             boolean exitProgram = false;
             int timeout = 10; // Seconds to wait before invalidating the connection
-            Scanner scan = new Scanner(System.in);
+            TerminalIOManager terminalIOManager = new TerminalIOManager(new Scanner(System.in));
             Connection conn = PostgreSQLConnector.openConnection();
             while(!exitProgram && conn.isValid(timeout)) {
                 System.out.println("Project Task management for IT Company.");
-                TerminalOutputManager.printActivityMenu();
-                System.out.println("Please select the activity to perform:");
-                String selActivity = scan.next();
+                TerminalIOManager.printActivityMenu();
+                String selActivity = terminalIOManager.askUserForString("Please select the activity to perform:");
                 int activity = Integer.parseInt(selActivity);
                 switch (activity) {
                     case 1:
-                        createATaskActivity(conn);
+                        createATaskActivity(conn, terminalIOManager);
                         break;
                     case 2:
-                        createADeveloperActivity(conn);
+                        createADeveloperActivity(conn, terminalIOManager);
                         break;
                     case 3:
-                        assignATaskActivity(conn);
+                        assignATaskActivity(conn, terminalIOManager);
                         break;
                     case 4:
-                        findOverdueTasksActivity(conn);
+                        findOverdueTasksActivity(conn, terminalIOManager);
                         break;
                     case 5:
-                        assignAPeriodOfTimeActivity(conn);
+                        assignAPeriodOfTimeActivity(conn, terminalIOManager);
                         break;
                     case 6:
-                        findAllTaskWithoutEstimateActivity(conn);
+                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
                         break;
                     case 7:
                         findAllAssignedWorkableTasksActivity(conn);
@@ -58,47 +57,65 @@ public class Main {
             }
             conn.close();
         } catch (ClassNotFoundException e) {
-            TerminalOutputManager.printErrorWithStackTrace("PostgreSQL Driver could not be loaded. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("PostgreSQL Driver could not be loaded. Error:", e);
         } catch (SQLException e) {
-            TerminalOutputManager.printErrorWithStackTrace("Database Connection could not be established. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("Database Connection could not be established. Error:", e);
         }
     }
 
-    private static void createATaskActivity(Connection conn) {
+    private static void createATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
 
     }
 
-    private static void createADeveloperActivity(Connection conn) {
+    private static void createADeveloperActivity(Connection conn, TerminalIOManager terminalIOManager) {
 
     }
 
-    private static void assignATaskActivity(Connection conn) {
+    private static void assignATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
 
     }
 
-    private static void findOverdueTasksActivity(Connection conn) {
+    private static void findOverdueTasksActivity(Connection conn, TerminalIOManager terminalIOManager) {
 
     }
 
-    private static void assignAPeriodOfTimeActivity(Connection conn) {
+    private static void assignAPeriodOfTimeActivity(Connection conn, TerminalIOManager terminalIOManager) {
 
     }
 
-    private static void findAllTaskWithoutEstimateActivity(Connection conn) {
-
+    private static void findAllTaskWithoutEstimateActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        String projectCode = terminalIOManager.askUserForString("Project code: ");
+        if (!projectCode.isEmpty()) {
+            try {
+                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getUnestimatedTasksForProject(conn);
+                preparedStatement.setString(1, projectCode);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                TerminalIOManager.printResultSet(resultSet);
+            } catch (SQLException e) {
+                TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            }
+        } else {
+            TerminalIOManager.printError("Provided Project Code was empty.");
+        }
     }
 
     private static void findAllAssignedWorkableTasksActivity(Connection conn) {
-
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getDeveloperWorkableTasksStatement(conn);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            TerminalIOManager.printResultSet(resultSet);
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
     }
 
     private static void listAllDevelopersActivity(Connection conn) {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getDeveloperListStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
-            TerminalOutputManager.printResultSet(resultSet);
+            TerminalIOManager.printResultSet(resultSet);
         } catch (SQLException e) {
-            TerminalOutputManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
     }
 
@@ -106,9 +123,9 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getTaskListStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
-            TerminalOutputManager.printResultSet(resultSet);
+            TerminalIOManager.printResultSet(resultSet);
         } catch (SQLException e) {
-            TerminalOutputManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
     }
 
@@ -116,9 +133,9 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getProjectWithMilestoneList(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
-            TerminalOutputManager.printResultSet(resultSet);
+            TerminalIOManager.printResultSet(resultSet);
         } catch (SQLException e) {
-            TerminalOutputManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
     }
 }

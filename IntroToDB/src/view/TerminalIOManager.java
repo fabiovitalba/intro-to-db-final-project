@@ -3,9 +3,19 @@ package view;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Scanner;
 
-public class TerminalOutputManager {
-    private TerminalOutputManager() {}
+public class TerminalIOManager {
+    private final Scanner scanner;
+
+    public TerminalIOManager(Scanner scanner) {
+        this.scanner = scanner;
+    }
+
+    public String askUserForString(String valueQuestion) {
+        System.out.println(valueQuestion);
+        return scanner.next();
+    }
 
     public static void printActivityMenu() {
         System.out.println("1) Create a Task");
@@ -20,6 +30,10 @@ public class TerminalOutputManager {
         System.out.println("10) List all Projects with Milestones");
         System.out.println("-------------------------------------");
         System.out.println("99) Exit application");
+    }
+
+    public static void printError(String errorMessage) {
+        System.out.println(errorMessage);
     }
 
     public static void printErrorWithStackTrace(String errorMessage, Exception e) {
