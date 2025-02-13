@@ -49,10 +49,14 @@ public class PostgreSQLStatementBuilder {
         return prepStmt;
     }
 
-    public static PreparedStatement releaseTask(Connection conn, int taskId) throws SQLException {
-        //TODO
-        PreparedStatement prepStmt = conn.prepareStatement("");
-        prepStmt.setInt(1, taskId);
+    public static PreparedStatement releaseTask(Connection conn, int taskId, Date dateReleased) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement(
+                "UPDATE Task " +
+                    "SET status = 'authorized', dateReleased = ? " +
+                    "WHERE (taskId = ?) AND (status = 'not authorized');"
+        );
+        prepStmt.setDate(1, dateReleased);
+        prepStmt.setInt(2, taskId);
         return prepStmt;
     }
 
@@ -60,7 +64,8 @@ public class PostgreSQLStatementBuilder {
         PreparedStatement prepStmt = conn.prepareStatement(
                 "UPDATE Task " +
                 "SET assignedDeveloper = ? " +
-                "WHERE taskId = ?;");
+                "WHERE taskId = ?;"
+        );
         prepStmt.setInt(1, developerId);
         prepStmt.setInt(2, taskId);
         return prepStmt;
@@ -151,6 +156,14 @@ public class PostgreSQLStatementBuilder {
     public static PreparedStatement getTaskListStatement(Connection conn) throws SQLException {
         return conn.prepareStatement(
                 "SELECT * FROM Task;"
+        );
+    }
+
+    public static PreparedStatement getUnreleasedTaskListStatement(Connection conn) throws SQLException {
+        return conn.prepareStatement(
+                "SELECT * " +
+                    "FROM Task " +
+                    "WHERE status = 'not authorized';"
         );
     }
 

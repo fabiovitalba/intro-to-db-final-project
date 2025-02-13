@@ -124,10 +124,19 @@ public class Main {
 
     private static void releaseTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Release Task");
-        int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        System.out.println("This is the list of unreleased Tasks:");
+        try {
+            PreparedStatement tasksPreparedStatement = PostgreSQLStatementBuilder.getUnreleasedTaskListStatement(conn);
+            ResultSet resultSet = tasksPreparedStatement.executeQuery();
+            TerminalIOManager.printResultSet(resultSet);
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
+
+        int taskId = terminalIOManager.askUserForInt("Task ID to release: ");
 
         try {
-            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.releaseTask(conn, taskId);
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.releaseTask(conn, taskId, Date.valueOf(LocalDate.now()));
             preparedStatement.executeUpdate();
             System.out.println("Task was released!");
         } catch (SQLException e) {
