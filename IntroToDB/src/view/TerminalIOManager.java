@@ -37,7 +37,7 @@ public class TerminalIOManager {
 
     public static void printActivityMenu() {
         System.out.println("1) Create a Task");
-        System.out.println("2) Create a Developer");
+        System.out.println("2) Release a Task");
         System.out.println("3) Assign a Task to a Developer");
         System.out.println("4) Find overdue Tasks in a Project");
         System.out.println("5) Find overdue Tasks in a Project (w/ Progress)");

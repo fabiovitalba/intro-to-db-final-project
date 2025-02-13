@@ -52,6 +52,12 @@ public class PostgreSQLStatementBuilder {
         return prepStmt;
     }
 
+    public static PreparedStatement releaseTask(Connection conn, int taskId) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement("");
+        prepStmt.setInt(1, taskId);
+        return prepStmt;
+    }
+
     public static PreparedStatement getOverdueTasksInProject(Connection conn, String projectCode, Date referenceDate) throws  SQLException {
         PreparedStatement prepStmt = conn.prepareStatement(
                 "SELECT T.taskId, T.description, T.assignedDeveloper, T.dueDate, T.status " +

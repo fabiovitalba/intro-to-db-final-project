@@ -4,6 +4,7 @@ import view.TerminalIOManager;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -81,46 +82,50 @@ public class Main {
         int assignedDeveloperId = terminalIOManager.askUserForInt("Assigned Developer ID: ");
         String taskType = terminalIOManager.askUserForString("Type (Bugfix, Feature, CodeReview):");
 
-        if (!projectCode.isEmpty()) {
-            try {
-                conn.setAutoCommit(false); // bundle transactions
+        try {
+            conn.setAutoCommit(false); // bundle transactions
 
-                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.insertTask(conn,
-                        taskId, taskDesc, taskStatus, dueDate, null, creationDate, null,
-                        projectCode, milestoneCode, assignedDeveloperId);
-                preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.insertTask(conn,
+                    taskId, taskDesc, taskStatus, dueDate, null, creationDate, null,
+                    projectCode, milestoneCode, assignedDeveloperId);
+            preparedStatement.executeUpdate();
 
-                switch (taskType.toLowerCase()) {
-                    case "bugfix":
-                        String impact = terminalIOManager.askUserForString("Impact (low, medium, high): ");
-                        PreparedStatement bugfixPreparedStatement = PostgreSQLStatementBuilder.insertBugfixTask(conn, taskId, impact);
-                        bugfixPreparedStatement.executeUpdate();
-                        break;
-                    case "feature":
-                        String complexity = terminalIOManager.askUserForString("Complexity (low, medium, high): ");
-                        PreparedStatement featurePreparedStatement = PostgreSQLStatementBuilder.insertFeatureTask(conn, taskId, complexity);
-                        featurePreparedStatement.executeUpdate();
-                        break;
-                    case "codereview":
-                        PreparedStatement codeReviewPrepStatement = PostgreSQLStatementBuilder.insertCodeReviewTask(conn, taskId);
-                        codeReviewPrepStatement.executeUpdate();
-                        break;
-                }
-
-                conn.commit(); // commit transaction
-                conn.setAutoCommit(true); // restore to default
-                System.out.println("Task was added!");
-            } catch (SQLException e) {
-                TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            switch (taskType.toLowerCase()) {
+                case "bugfix":
+                    String impact = terminalIOManager.askUserForString("Impact (low, medium, high): ");
+                    PreparedStatement bugfixPreparedStatement = PostgreSQLStatementBuilder.insertBugfixTask(conn, taskId, impact);
+                    bugfixPreparedStatement.executeUpdate();
+                    break;
+                case "feature":
+                    String complexity = terminalIOManager.askUserForString("Complexity (low, medium, high): ");
+                    PreparedStatement featurePreparedStatement = PostgreSQLStatementBuilder.insertFeatureTask(conn, taskId, complexity);
+                    featurePreparedStatement.executeUpdate();
+                    break;
+                case "codereview":
+                    PreparedStatement codeReviewPrepStatement = PostgreSQLStatementBuilder.insertCodeReviewTask(conn, taskId);
+                    codeReviewPrepStatement.executeUpdate();
+                    break;
             }
-        } else {
-            TerminalIOManager.printError("Provided Project Code was empty.");
+
+            conn.commit(); // commit transaction
+            conn.setAutoCommit(true); // restore to default
+            System.out.println("Task was added!");
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
     }
 
     private static void releaseTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Release Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
+
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.releaseTask(conn, taskId);
+            preparedStatement.executeUpdate();
+            System.out.println("Task was released!");
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
     }
 
     private static void assignATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
