@@ -6,7 +6,7 @@ public class PostgreSQLStatementBuilder {
     private PostgreSQLStatementBuilder() {}
 
     public static PreparedStatement insertTask(Connection conn, int taskId, String desc, String status, Date dueDate, Date dateReleased, Date creationDate, Date completionDate, String projectCode, String milestoneCode, int developerId) throws SQLException {
-        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO Task VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO Task VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         prepStmt.setInt(1, taskId);
         prepStmt.setString(2, desc);
         prepStmt.setString(3, status);
@@ -30,21 +30,21 @@ public class PostgreSQLStatementBuilder {
     }
 
     public static PreparedStatement insertBugfixTask(Connection conn, int taskId, String impact) throws SQLException {
-        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO BugfixTask VALUES (?, ?)");
+        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO BugfixTask VALUES (?, ?);");
         prepStmt.setInt(1, taskId);
         prepStmt.setString(2, impact);
         return prepStmt;
     }
 
     public static PreparedStatement insertFeatureTask(Connection conn, int taskId, String complexity) throws SQLException {
-        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO FeatureTask VALUES (?, ?)");
+        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO FeatureTask VALUES (?, ?);");
         prepStmt.setInt(1, taskId);
         prepStmt.setString(2, complexity);
         return prepStmt;
     }
 
     public static PreparedStatement insertCodeReviewTask(Connection conn, int taskId) throws SQLException {
-        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO CodeReviewTask VALUES (?)");
+        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO CodeReviewTask VALUES (?);");
         prepStmt.setInt(1, taskId);
         return prepStmt;
     }
@@ -56,8 +56,18 @@ public class PostgreSQLStatementBuilder {
         return prepStmt;
     }
 
+    public static PreparedStatement assignTask(Connection conn, int taskId, int developerId) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement(
+                "UPDATE Task " +
+                "SET assignedDeveloper = ? " +
+                "WHERE taskId = ?;");
+        prepStmt.setInt(1, developerId);
+        prepStmt.setInt(2, taskId);
+        return prepStmt;
+    }
+
     public static PreparedStatement insertTimeLog(Connection conn, int taskId, int developerId, Date startDate, Time startTime, Date endDate, Time endTime, double duration) throws SQLException {
-        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO TimeLog VALUES (?, ?, ?, ?, ?, ?, ?)");
+        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO TimeLog VALUES (?, ?, ?, ?, ?, ?, ?);");
         prepStmt.setInt(1, developerId);
         prepStmt.setInt(2, taskId);
         prepStmt.setDate(3, startDate);
@@ -104,8 +114,6 @@ public class PostgreSQLStatementBuilder {
         return prepStmt;
     }
 
-    // TODO
-
     public static PreparedStatement getUnestimatedTasksForProject(Connection conn, String projectCode) throws SQLException {
         PreparedStatement prepStmt = conn.prepareStatement(
                 "SELECT T.project, T.taskId, T.description, T.status, T.creationDate, T.dueDate " +
@@ -124,7 +132,7 @@ public class PostgreSQLStatementBuilder {
                     "FROM Developer D " +
                     "JOIN Task T ON T.assignedDeveloper = D.employeeId " +
                     "WHERE T.status in ('authorized','in progress') " +
-                    "ORDER BY D.name ASC, T.dueDate ASC"
+                    "ORDER BY D.name ASC, T.dueDate ASC;"
         );
     }
 

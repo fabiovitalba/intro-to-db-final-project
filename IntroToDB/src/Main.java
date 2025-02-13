@@ -133,7 +133,17 @@ public class Main {
     }
 
     private static void assignATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        System.out.println("Selected: Assign a Task");
+        int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        int developerId = terminalIOManager.askUserForInt("Developer ID: ");
 
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.assignTask(conn, taskId, developerId);
+            preparedStatement.executeUpdate();
+            System.out.println("Task was assigned!");
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
     }
 
     private static void findOverdueTasksActivity(Connection conn, TerminalIOManager terminalIOManager) {
