@@ -140,6 +140,24 @@ public class PostgreSQLStatementBuilder {
         );
     }
 
+    public static PreparedStatement getTaskListWithProgress(Connection conn) throws  SQLException {
+        return conn.prepareStatement(
+            "SELECT TWP.taskId, TWP.description, D.name, TWP.dueDate, TWP.status, TWP.workedHrs, " +
+                    "TWP.estimateHrs, TWP.progressPerc " +
+                    "FROM ( " +
+                        "SELECT T.taskId, T.description, T.assignedDeveloper, T.dueDate, T.status, " +
+                            "SUM(TL.timeWorkedHrs) as workedHrs, SUM(E.estimatedEffortHrs) as estimateHrs, " +
+                            "ROUND((SUM(TL.timeWorkedHrs)/SUM(E.estimatedEffortHrs))*100,2) as progressPerc " +
+                        "FROM Task T " +
+                        "LEFT JOIN TimeLog TL ON TL.task = T.taskId " +
+                        "LEFT JOIN Estimates E ON E.task = T.taskId " +
+                        "GROUP BY T.taskId " +
+                        "ORDER BY T.taskId" +
+                    ") TWP " +
+                    "LEFT JOIN Developer D ON TWP.assignedDeveloper = D.employeeId;"
+        );
+    }
+
     public static PreparedStatement getProjectWithMilestoneList(Connection conn) throws SQLException {
         return conn.prepareStatement(
                 "SELECT P.code as project, P.description as pDescription, " +

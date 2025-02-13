@@ -46,13 +46,14 @@ public class TerminalIOManager {
         System.out.println("2) Release a Task");
         System.out.println("3) Assign a Task to a Developer");
         System.out.println("4) Find overdue Tasks in a Project");
-        System.out.println("5) Find overdue Tasks in a Project (w/ Progress)");
+        System.out.println("5) Find overdue Tasks in a Project (with Progress)");
         System.out.println("6) Assign worked time to a Task of a Developer");
         System.out.println("7) Find all Tasks without estimate in a Project");
         System.out.println("8) Find all assigned, workable Tasks for the current week for all Developers");
         System.out.println("9) List all Developers");
         System.out.println("10) List all Tasks");
-        System.out.println("11) List all Projects with Milestones");
+        System.out.println("11) List all Tasks (with Progress)");
+        System.out.println("12) List all Projects with Milestones");
         System.out.println("-------------------------------------");
         System.out.println("99) Exit application");
         System.out.println();

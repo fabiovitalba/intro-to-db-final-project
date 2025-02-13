@@ -54,6 +54,9 @@ public class Main {
                         listAllTasksActivity(conn);
                         break;
                     case 11:
+                        listAllTasksWProgressActivity(conn);
+                        break;
+                    case 12:
                         listAllProjectsWithMilestonesActivity(conn);
                         break;
                     case 99:
@@ -229,6 +232,17 @@ public class Main {
         System.out.println("Selected: List all Tasks");
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getTaskListStatement(conn);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            TerminalIOManager.printResultSet(resultSet);
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
+    }
+
+    private static void listAllTasksWProgressActivity(Connection conn) {
+        System.out.println("Selected: List all Tasks (with progress)");
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getTaskListWithProgress(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
             TerminalIOManager.printResultSet(resultSet);
         } catch (SQLException e) {
