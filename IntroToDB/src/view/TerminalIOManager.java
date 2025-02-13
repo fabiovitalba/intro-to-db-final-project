@@ -59,7 +59,7 @@ public class TerminalIOManager {
         System.out.println("| 6) Find overdue Tasks in a Project                                           |");
         System.out.println("| 7) Find overdue Tasks in a Project (with Progress)                           |");
         System.out.println("| 8) Find all Tasks without estimate in a Project                              |");
-        System.out.println("| 9) Find all assigned, workable Tasks for the current week for all Developers |");
+        System.out.println("| 9) Find all assigned, workable Tasks for all Developers                      |");
         System.out.println("|------------------------------------------------------------------------------|");
         System.out.println("| 10) List all Developers                                                      |");
         System.out.println("| 11) List all Tasks                                                           |");
