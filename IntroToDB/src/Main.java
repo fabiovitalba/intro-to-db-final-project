@@ -33,30 +33,33 @@ public class Main {
                         assignATaskActivity(conn, terminalIOManager);
                         break;
                     case 4:
-                        findOverdueTasksActivity(conn, terminalIOManager);
-                        break;
-                    case 5:
-                        findOverdueTasksWithProgressActivity(conn, terminalIOManager);
-                        break;
-                    case 6:
                         assignAPeriodOfTimeActivity(conn, terminalIOManager);
                         break;
+                    case 5:
+                        deleteTaskActivity(conn, terminalIOManager);
+                        break;
+                    case 6:
+                        findOverdueTasksActivity(conn, terminalIOManager);
+                        break;
                     case 7:
-                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
+                        findOverdueTasksWithProgressActivity(conn, terminalIOManager);
                         break;
                     case 8:
-                        findAllAssignedWorkableTasksActivity(conn);
+                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
                         break;
                     case 9:
-                        listAllDevelopersActivity(conn);
+                        findAllAssignedWorkableTasksActivity(conn);
                         break;
                     case 10:
-                        listAllTasksActivity(conn);
+                        listAllDevelopersActivity(conn);
                         break;
                     case 11:
-                        listAllTasksWProgressActivity(conn);
+                        listAllTasksActivity(conn);
                         break;
                     case 12:
+                        listAllTasksWProgressActivity(conn);
+                        break;
+                    case 13:
                         listAllProjectsWithMilestonesActivity(conn);
                         break;
                     case 99:
@@ -141,6 +144,19 @@ public class Main {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.assignTask(conn, taskId, developerId);
             preparedStatement.executeUpdate();
             System.out.println("Task was assigned!");
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
+    }
+
+    private static void deleteTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        System.out.println("Selected: Delete Task");
+        int taskId = terminalIOManager.askUserForInt("Task ID: ");
+
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.deleteTask(conn, taskId);
+            preparedStatement.executeUpdate();
+            System.out.println("Task was deleted!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }

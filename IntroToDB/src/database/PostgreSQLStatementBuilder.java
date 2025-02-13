@@ -66,6 +66,12 @@ public class PostgreSQLStatementBuilder {
         return prepStmt;
     }
 
+    public static PreparedStatement deleteTask(Connection conn, int taskId) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement("DELETE FROM Task WHERE taskId = ?;");
+        prepStmt.setInt(1, taskId);
+        return prepStmt;
+    }
+
     public static PreparedStatement insertTimeLog(Connection conn, int taskId, int developerId, Date startDate, Time startTime, Date endDate, Time endTime, double duration) throws SQLException {
         PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO TimeLog VALUES (?, ?, ?, ?, ?, ?, ?);");
         prepStmt.setInt(1, developerId);
