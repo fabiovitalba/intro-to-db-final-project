@@ -68,8 +68,10 @@ public class TerminalIOManager {
     }
 
     public static void printErrorWithStackTrace(String errorMessage, Exception e) {
+        //e.printStackTrace();
         System.out.println(errorMessage + " " + e.getMessage());
-        e.printStackTrace();
+        System.out.println();
+        System.out.println();
     }
 
     public static void printResultSet(ResultSet resultSet) throws SQLException {
