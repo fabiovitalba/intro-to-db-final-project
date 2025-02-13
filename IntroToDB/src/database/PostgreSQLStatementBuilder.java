@@ -1,24 +1,28 @@
 package database;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class PostgreSQLStatementBuilder {
     private PostgreSQLStatementBuilder() {}
 
-    public static PreparedStatement getOverdueTasksInProject(Connection conn) throws  SQLException {
-        return conn.prepareStatement(
+    public static PreparedStatement getOverdueTasksInProject(Connection conn, String projectCode, Date referenceDate) throws  SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement(
                 "SELECT T.taskId, T.description, T.assignedDeveloper, T.dueDate, T.status " +
                 "FROM Task T " +
                 "WHERE (T.project = ?) AND " +
                     "(T.dueDate < ?) AND " +
                     "(T.status in ('authorized','in progress','test'));"
         );
+        prepStmt.setString(1, projectCode);
+        prepStmt.setDate(2, referenceDate);
+        return prepStmt;
     }
 
-    public static PreparedStatement getOverdueTasksWithProgressInProject(Connection conn) throws  SQLException {
-        return conn.prepareStatement(
+    public static PreparedStatement getOverdueTasksWithProgressInProject(Connection conn, String projectCode, Date referenceDate) throws  SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement(
                 "SELECT TWP.taskId, TWP.description, D.name, TWP.dueDate, TWP.status, TWP.workedHrs, " +
                         "TWP.estimateHrs, TWP.progressPerc " +
                     "FROM ( " +
@@ -35,18 +39,23 @@ public class PostgreSQLStatementBuilder {
                     ") TWP " +
                     "LEFT JOIN Developer D ON TWP.assignedDeveloper = D.employeeId;"
         );
+        prepStmt.setString(1, projectCode);
+        prepStmt.setDate(2, referenceDate);
+        return prepStmt;
     }
 
     // TODO
 
-    public static PreparedStatement getUnestimatedTasksForProject(Connection conn) throws SQLException {
-        return conn.prepareStatement(
+    public static PreparedStatement getUnestimatedTasksForProject(Connection conn, String projectCode) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement(
                 "SELECT T.project, T.taskId, T.description, T.status, T.creationDate, T.dueDate " +
                     "FROM Task T " +
                     "LEFT JOIN Estimates E ON E.task = T.taskId " +
                     "WHERE (T.project = ?) AND " +
                         " ((E.estimatedEffortHrs <= 0) OR (E.estimatedEffortHrs IS NULL));"
         );
+        prepStmt.setString(1, projectCode);
+        return prepStmt;
     }
 
     public static PreparedStatement getDeveloperWorkableTasksStatement(Connection conn) throws SQLException {

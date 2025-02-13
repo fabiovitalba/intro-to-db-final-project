@@ -83,9 +83,7 @@ public class Main {
         String projectCode = terminalIOManager.askUserForString("Project code: ");
         if (!projectCode.isEmpty()) {
             try {
-                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksInProject(conn);
-                preparedStatement.setString(1, projectCode);
-                preparedStatement.setDate(2, Date.valueOf(LocalDate.now()));
+                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksInProject(conn, projectCode, Date.valueOf(LocalDate.now()));
                 ResultSet resultSet = preparedStatement.executeQuery();
                 TerminalIOManager.printResultSet(resultSet);
             } catch (SQLException e) {
@@ -100,9 +98,7 @@ public class Main {
         String projectCode = terminalIOManager.askUserForString("Project code: ");
         if (!projectCode.isEmpty()) {
             try {
-                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksWithProgressInProject(conn);
-                preparedStatement.setString(1, projectCode);
-                preparedStatement.setDate(2, Date.valueOf(LocalDate.now()));
+                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksWithProgressInProject(conn, projectCode, Date.valueOf(LocalDate.now()));
                 ResultSet resultSet = preparedStatement.executeQuery();
                 TerminalIOManager.printResultSet(resultSet);
             } catch (SQLException e) {
@@ -121,8 +117,7 @@ public class Main {
         String projectCode = terminalIOManager.askUserForString("Project code: ");
         if (!projectCode.isEmpty()) {
             try {
-                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getUnestimatedTasksForProject(conn);
-                preparedStatement.setString(1, projectCode);
+                PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getUnestimatedTasksForProject(conn, projectCode);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 TerminalIOManager.printResultSet(resultSet);
             } catch (SQLException e) {
