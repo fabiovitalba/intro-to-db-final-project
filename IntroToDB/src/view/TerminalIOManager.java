@@ -28,17 +28,23 @@ public class TerminalIOManager {
     public Date askUserForDate(String valueQuestion) {
         System.out.println(valueQuestion);
         String scannerInput = scanner.next();
-        if (scannerInput.equalsIgnoreCase("null"))
-            return null;
-        return Date.valueOf(LocalDate.parse(scannerInput));
+        return switch (scannerInput.toLowerCase()) {
+            case "null" -> null;
+            case "today" -> Date.valueOf(LocalDate.now());
+            case "yesterday" -> Date.valueOf(LocalDate.now().minusDays(1));
+            case "tomorrow" -> Date.valueOf(LocalDate.now().plusDays(1));
+            default -> Date.valueOf(LocalDate.parse(scannerInput));
+        };
     }
 
     public Time askUserForTime(String valueQuestion) {
         System.out.println(valueQuestion);
         String scannerInput = scanner.next();
-        if (scannerInput.equalsIgnoreCase("null"))
-            return null;
-        return Time.valueOf(LocalTime.parse(scannerInput));
+        return switch (scannerInput.toLowerCase()) {
+            case "null" -> null;
+            case "now" -> Time.valueOf(LocalTime.now());
+            default -> Time.valueOf(LocalTime.parse(scannerInput));
+        };
     }
 
     public static void printActivityMenu() {
