@@ -3,8 +3,9 @@ import database.PostgreSQLStatementBuilder;
 import view.TerminalIOManager;
 
 import java.sql.*;
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class Main {
@@ -165,7 +166,25 @@ public class Main {
     }
 
     private static void assignAPeriodOfTimeActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        System.out.println("Selected: Assign worked time to a Task of a Developer");
+        int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        int developerId = terminalIOManager.askUserForInt("Developer ID: ");
+        Date startDate = terminalIOManager.askUserForDate("Start Date: ");
+        Time startTime = terminalIOManager.askUserForTime("Start Time: ");
+        Date endDate = terminalIOManager.askUserForDate("End Date: ");
+        Time endTime = terminalIOManager.askUserForTime("End Time: ");
 
+        LocalDateTime startDateTime = LocalDateTime.of(startDate.toLocalDate(), startTime.toLocalTime());
+        LocalDateTime endDateTime = LocalDateTime.of(endDate.toLocalDate(), endTime.toLocalTime());
+        Duration duration = Duration.between(startDateTime, endDateTime);
+        double hours = Math.round(duration.toSeconds() * 100.0 / 3600.0) / 100.0;
+
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.insertTimeLog(conn, taskId, developerId, startDate, startTime, endDate, endTime, hours);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+        }
     }
 
     private static void findAllTaskWithoutEstimateActivity(Connection conn, TerminalIOManager terminalIOManager) {

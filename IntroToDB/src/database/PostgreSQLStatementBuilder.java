@@ -1,9 +1,6 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class PostgreSQLStatementBuilder {
     private PostgreSQLStatementBuilder() {}
@@ -53,8 +50,21 @@ public class PostgreSQLStatementBuilder {
     }
 
     public static PreparedStatement releaseTask(Connection conn, int taskId) throws SQLException {
+        //TODO
         PreparedStatement prepStmt = conn.prepareStatement("");
         prepStmt.setInt(1, taskId);
+        return prepStmt;
+    }
+
+    public static PreparedStatement insertTimeLog(Connection conn, int taskId, int developerId, Date startDate, Time startTime, Date endDate, Time endTime, double duration) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO TimeLog VALUES (?, ?, ?, ?, ?, ?, ?)");
+        prepStmt.setInt(1, developerId);
+        prepStmt.setInt(2, taskId);
+        prepStmt.setDate(3, startDate);
+        prepStmt.setTime(4, startTime);
+        prepStmt.setDate(5, endDate);
+        prepStmt.setTime(6, endTime);
+        prepStmt.setDouble(7, duration);
         return prepStmt;
     }
 
