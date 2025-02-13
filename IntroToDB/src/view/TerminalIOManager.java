@@ -3,6 +3,8 @@ package view;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.sql.Date;
 import java.util.Scanner;
 
 public class TerminalIOManager {
@@ -15,6 +17,22 @@ public class TerminalIOManager {
     public String askUserForString(String valueQuestion) {
         System.out.println(valueQuestion);
         return scanner.next();
+    }
+
+    public int askUserForInt(String valueQuestion) {
+        System.out.println(valueQuestion);
+        String scannerInput = scanner.next();
+        if (scannerInput.equalsIgnoreCase("null"))
+            return 0;
+        return Integer.parseInt(scannerInput); // might return null
+    }
+
+    public Date askUserForDate(String valueQuestion) {
+        System.out.println(valueQuestion);
+        String scannerInput = scanner.next();
+        if (scannerInput.equalsIgnoreCase("null"))
+            return null;
+        return Date.valueOf(LocalDate.parse(scannerInput));
     }
 
     public static void printActivityMenu() {
@@ -72,7 +90,7 @@ public class TerminalIOManager {
         if (localWidth > 50)
             localWidth = 50;
         String localCellValue = cellValue;
-        if (localCellValue.length() > localWidth)
+        if ((cellValue != null) && (localCellValue.length() > localWidth))
             localCellValue = localCellValue.substring(0,localWidth);
         return String.format(" %1$-" + localWidth + "s ", localCellValue);
     }
