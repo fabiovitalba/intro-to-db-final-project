@@ -340,7 +340,7 @@ BEGIN
 		(NEW.employeeId IN (SELECT employeeId FROM JuniorDeveloper)) OR
 		(NEW.employeeId IN (SELECT employeeId FROM MidDeveloper))
 	) THEN
-		RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled for employeeId %.', NEW.employeeId;
+	    RAISE EXCEPTION 'Developer disjointness constraint is not fulfilled for employeeId %.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -476,8 +476,8 @@ BEGIN
         SELECT 1
         FROM Project
         WHERE Project.code = NEW.project
-          AND Project.startingDate <= NEW.startingDate
-          AND Project.endingDate >= NEW.endingDate
+            AND Project.startingDate <= NEW.startingDate
+            AND Project.endingDate >= NEW.endingDate
     ) THEN
         RAISE EXCEPTION 'No corresponding project with overlapping dates found for milestone % %.', NEW.project, NEW.code;
     END IF;
@@ -491,6 +491,29 @@ ON Milestone
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION MilestoneCheckProjectDates();
+
+
+CREATE OR REPLACE FUNCTION TimeLogCheckAssignedDeveloper()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS(
+        SELECT 1
+        FROM Task
+        WHERE Task.taskId = NEW.task
+            AND Task.assignedDeveloper = NEW.developer
+    ) THEN
+        RAISE EXCEPTION 'Task % is not assigned to developer %.', NEW.task, NEW.developer;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER TimeLogOnBeforeInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
+ON TimeLog
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION TimeLogCheckAssignedDeveloper();
 -- <<< External Constraints <<<
 
 
