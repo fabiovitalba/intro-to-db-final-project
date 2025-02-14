@@ -549,7 +549,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger2
 AFTER INSERT OR UPDATE
-On Task
+ON Task
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckBugfixTaskAssignedDeveloper();
@@ -573,7 +573,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger3
 AFTER INSERT OR UPDATE
-On Task
+ON Task
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckFeatureTaskAssignedDeveloper();
@@ -593,7 +593,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger4
 AFTER INSERT OR UPDATE
-On Task
+ON Task
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckAtMostThreeWorkableTasks();
@@ -613,10 +613,32 @@ $$ LANGUAGE plpgsql;
 
 CREATE CONSTRAINT TRIGGER TimeLogOnAfterInsertOrUpdateTrigger3
 AFTER INSERT OR UPDATE
-On TimeLog
+ON TimeLog
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckTimeLogWithinCompletionDate();
+
+
+CREATE OR REPLACE FUNCTION CheckTimeLogForReviewExists()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM TimeLog
+        WHERE task = NEW.codeReviewTask
+            AND developer = NEW.developer
+    ) THEN
+        RAISE EXCEPTION 'Review of Task % by Developer % does not have a connected Time Log entry.', NEW.codeReviewTask, NEW.developer;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER CodeReviewTaskOnAfterInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
+ON Reviews
+FOR EACH ROW
+EXECUTE FUNCTION CheckTimeLogForReviewExists();
 -- <<< External Constraints <<<
 
 
