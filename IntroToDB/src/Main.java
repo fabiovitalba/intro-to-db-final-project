@@ -128,7 +128,7 @@ public class Main {
             conn.setAutoCommit(true); // restore to default
             TerminalIOManager.printSuccess("Task was added!");
         } catch (SQLException e) {
-            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
         }
     }
 
@@ -184,7 +184,7 @@ public class Main {
             preparedStatement.executeUpdate();
             TerminalIOManager.printSuccess("Task was released!");
         } catch (SQLException e) {
-            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
         }
     }
 
@@ -202,7 +202,7 @@ public class Main {
             preparedStatement.executeUpdate();
             TerminalIOManager.printSuccess("Task was assigned!");
         } catch (SQLException e) {
-            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
         }
     }
 
@@ -217,7 +217,7 @@ public class Main {
             preparedStatement.executeUpdate();
             TerminalIOManager.printSuccess("Task was deleted!");
         } catch (SQLException e) {
-            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
         }
     }
 
