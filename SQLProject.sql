@@ -518,10 +518,10 @@ CREATE OR REPLACE FUNCTION TimeLogCheckDates()
 RETURNS TRIGGER AS $$
 BEGIN
     IF (
-        (NEW.endingDate < NEW.startingDate) OR
-        ((NEW.endingDate = NEW.startingDate) AND (NEW.endingTime < NEW.startingTime))
+        (NEW.endingDate < NEW.startDate) OR
+        ((NEW.endingDate = NEW.startDate) AND (NEW.endingTime < NEW.startTime))
     ) THEN
-        RAISE EXCEPTION 'End Date/Time (% %) lies before Start Date/Time (% %) in Time Log % %', NEW.endingDate, NEW.endingTime, NEW.startingDate, NEW.startingTime NEW.task, NEW.developer;
+        RAISE EXCEPTION 'End Date/Time (% %) lies before Start Date/Time (% %) in Time Log % %', NEW.endingDate, NEW.endingTime, NEW.startingDate, NEW.startingTime, NEW.task, NEW.developer;
     END IF;
     RETURN NEW;
 END;
