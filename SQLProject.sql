@@ -457,14 +457,12 @@ $$ LANGUAGE plpgsql;
 CREATE CONSTRAINT TRIGGER ProjectOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Project
-DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckDates();
 
 CREATE CONSTRAINT TRIGGER MilestoneOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Milestone
-DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckDates();
 
@@ -514,6 +512,26 @@ ON TimeLog
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION TimeLogCheckAssignedDeveloper();
+
+
+CREATE OR REPLACE FUNCTION TimeLogCheckDates()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (
+        (NEW.endingDate < NEW.startingDate) OR
+        ((NEW.endingDate = NEW.startingDate) AND (NEW.endingTime < NEW.startingTime))
+    ) THEN
+        RAISE EXCEPTION 'End Date/Time (% %) lies before Start Date/Time (% %) in Time Log % %', NEW.endingDate, NEW.endingTime, NEW.startingDate, NEW.startingTime NEW.task, NEW.developer;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER TimeLogOnAfterInsertOrUpdateTrigger2
+AFTER INSERT OR UPDATE
+ON TimeLog
+FOR EACH ROW
+EXECUTE FUNCTION TimeLogCheckDates();
 
 
 CREATE OR REPLACE FUNCTION CheckBugfixTaskAssignedDeveloper()
@@ -593,7 +611,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER TimeLogOnAfterInsertOrUpdateTrigger2
+CREATE CONSTRAINT TRIGGER TimeLogOnAfterInsertOrUpdateTrigger3
 AFTER INSERT OR UPDATE
 On TimeLog
 DEFERRABLE INITIALLY DEFERRED
