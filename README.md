@@ -15,6 +15,8 @@ The Project is described through the included documentation that you can find he
 ## 2. Installation
 - The SQL script is a PostgreSQL SQL script and as such must be executed on a PostgreSQL database. ATTENTION! The script deletes the tables if found, so you will lose data if executed without caution.
 
-- The Java Application can be run using java JDK. You likely need to have a valid PostgreSQL package in your classpath in order for it to function properly. You can download the PostgreSQL package from [here](https://jdbc.postgresql.org/download/) and put it into the `./IntroToDB/packages` folder. If it still does not work, make sure that the package is loaded properly.
+- The Java Application can be run using java JDK. 
+  - You likely need to have a valid PostgreSQL package in your classpath in order for it to function properly. You can download the PostgreSQL package from [here](https://jdbc.postgresql.org/download/) and put it into the `./IntroToDB/packages` folder. If it still does not work, make sure that the package is loaded properly.
+  - You may need to alter the PostgreSQLConnector settings in order to connect to your PostgreSQL instance. You find the class under `./IntroToDB/src/database/PostgreSQLConnector.java`.
 
 
