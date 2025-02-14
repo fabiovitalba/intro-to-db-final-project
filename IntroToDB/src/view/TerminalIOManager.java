@@ -73,12 +73,12 @@ public class TerminalIOManager {
     }
 
     public static void printError(String errorMessage) {
-        System.out.println(errorMessage);
+        System.out.println("\u001B[31m" + errorMessage + "\u001B[0m");
     }
 
     public static void printErrorWithStackTrace(String errorMessage, Exception e) {
         //e.printStackTrace();
-        System.out.println(errorMessage + " " + e.getMessage());
+        System.out.println("\u001B[31m" + errorMessage + " " + e.getMessage() + "\u001B[0m");
         System.out.println();
         System.out.println();
     }
@@ -87,13 +87,13 @@ public class TerminalIOManager {
         ResultSetMetaData rsMetaData = resultSet.getMetaData();
         int noOfColumns = rsMetaData.getColumnCount();
 
-        System.out.println();
+        System.out.println("\033[0;1m");
         // Column Captions
         for (int i = 1; i <= noOfColumns; i++) {
             System.out.print("|");
             System.out.print(padTableCell(rsMetaData.getColumnLabel(i), rsMetaData.getColumnDisplaySize(i) + 1));
         }
-        System.out.println("|");
+        System.out.println("|\u001B[34m");
 
         // Table Rows
         while(resultSet.next()) {
@@ -103,7 +103,7 @@ public class TerminalIOManager {
             }
             System.out.println("|");
         }
-        System.out.println();
+        System.out.println("\u001B[0m");
         System.out.println();
     }
 
