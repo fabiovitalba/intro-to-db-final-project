@@ -163,7 +163,9 @@ public class PostgreSQLStatementBuilder {
         return conn.prepareStatement(
                 "SELECT * " +
                     "FROM Task " +
-                    "WHERE status = 'not authorized';"
+                    "WHERE status = 'not authorized';",
+                ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
         );
     }
 

@@ -87,13 +87,13 @@ public class TerminalIOManager {
         ResultSetMetaData rsMetaData = resultSet.getMetaData();
         int noOfColumns = rsMetaData.getColumnCount();
 
-        System.out.println("\033[0;1m");
+        System.out.println("\033[0;1m\u001B[34m");
         // Column Captions
         for (int i = 1; i <= noOfColumns; i++) {
             System.out.print("|");
             System.out.print(padTableCell(rsMetaData.getColumnLabel(i), rsMetaData.getColumnDisplaySize(i) + 1));
         }
-        System.out.println("|\u001B[34m");
+        System.out.println("|\u001B[0m\u001B[34m");
 
         // Table Rows
         while(resultSet.next()) {

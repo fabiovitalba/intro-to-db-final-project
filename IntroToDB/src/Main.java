@@ -77,6 +77,12 @@ public class Main {
         }
     }
 
+    /**
+     * Allows the user to create new tasks. For date fields the user may input values using "today", "tomorrow",
+     * or "yesterday" keywords for easier input.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input/Output with Terminal
+     */
     private static void createATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Create Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
@@ -122,18 +128,50 @@ public class Main {
         }
     }
 
+    /**
+     * This activity allows the user to see the list of unreleased tasks (in status "not authorized").
+     * The user then may choose one of the tasks of said list, and the task will be updated to status "authorized".
+     * Additionally, the dateReleased is set automatically to the current date.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input/Output with Terminal
+     */
     private static void releaseTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Release Task");
         System.out.println("This is the list of unreleased Tasks:");
+
+        ResultSet resultSet;
         try {
             PreparedStatement tasksPreparedStatement = PostgreSQLStatementBuilder.getUnreleasedTaskListStatement(conn);
-            ResultSet resultSet = tasksPreparedStatement.executeQuery();
+            resultSet = tasksPreparedStatement.executeQuery();
+            if (!resultSet.first()) {
+                TerminalIOManager.printError("There are no unreleased Tasks to release.");
+                return;
+            }
+            resultSet.beforeFirst(); // reset position
             TerminalIOManager.printResultSet(resultSet);
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
+            return;
         }
 
         int taskId = terminalIOManager.askUserForInt("Task ID to release: ");
+
+        try {
+            int taskIdColNo = resultSet.findColumn("taskId");
+            boolean taskCanBeReleased = false;
+            resultSet.beforeFirst(); // reset position
+            while(!taskCanBeReleased && resultSet.next()) {
+                if (resultSet.getInt(taskIdColNo) == taskId)
+                    taskCanBeReleased = true;
+            }
+            if (!taskCanBeReleased) {
+                TerminalIOManager.printError("Task " + taskId + " cannot be released.");
+                return;
+            }
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("ResultSet cannot be interpreted. Error:", e);
+            return;
+        }
 
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.releaseTask(conn, taskId, Date.valueOf(LocalDate.now()));
