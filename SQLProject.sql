@@ -637,6 +637,7 @@ $$ LANGUAGE plpgsql;
 CREATE CONSTRAINT TRIGGER CodeReviewTaskOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Reviews
+DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckTimeLogForReviewExists();
 -- <<< External Constraints <<<
@@ -746,7 +747,9 @@ BEGIN TRANSACTION;
     INSERT INTO TimeLog(developer, task, startDate, startTime, endingDate, endingTime, timeWorkedHrs) VALUES
         (1, 1, '2022-05-01', '08:30:00', '2022-05-01', '16:30:00', 8.0),
         (2, 2, '2022-12-01', '09:30:00', '2022-12-01', '17:30:00', 8.0),
-        (3, 3, '2025-01-01', '08:00:00', '2025-01-01', '12:00:00', 4.0);
+        (3, 3, '2025-01-01', '08:00:00', '2025-01-01', '12:00:00', 4.0),
+        (1, 7, '2025-01-14', '08:45:00', '2025-01-14', '09:45:00', 1.0),
+        (4, 8, '2025-01-24', '08:45:00', '2025-01-24', '11:45:00', 3.0);
 
     INSERT INTO DueDateChange(developer, task, dateChanged, oldDueDate, newDueDate, reason, timeWorkedUntilNowHrs, currentEstimateHrs) VALUES
         (1, 1, '2022-05-15', '2022-06-10', '2022-06-15', 'Scope change', 40.0, 80.0),
