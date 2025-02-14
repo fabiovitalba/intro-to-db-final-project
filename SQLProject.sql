@@ -282,7 +282,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER DeveloperOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER DeveloperOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Developer
 DEFERRABLE INITIALLY DEFERRED
@@ -306,7 +306,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER JuniorDeveloperOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER JuniorDeveloperOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON JuniorDeveloper
 DEFERRABLE INITIALLY DEFERRED
@@ -326,7 +326,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER MidDeveloperOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER MidDeveloperOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON MidDeveloper
 DEFERRABLE INITIALLY DEFERRED
@@ -346,7 +346,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER SeniorDeveloperOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER SeniorDeveloperOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON SeniorDeveloper
 DEFERRABLE INITIALLY DEFERRED
@@ -371,7 +371,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER TaskOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Task
 DEFERRABLE INITIALLY DEFERRED
@@ -395,7 +395,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER BugfixTaskOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER BugfixTaskOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON BugfixTask
 DEFERRABLE INITIALLY DEFERRED
@@ -415,7 +415,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER FeatureTaskOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER FeatureTaskOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON FeatureTask
 DEFERRABLE INITIALLY DEFERRED
@@ -435,7 +435,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER CodeReviewTaskOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER CodeReviewTaskOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON CodeReviewTask
 DEFERRABLE INITIALLY DEFERRED
@@ -454,14 +454,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER ProjectOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER ProjectOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Project
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckDates();
 
-CREATE CONSTRAINT TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER MilestoneOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON Milestone
 DEFERRABLE INITIALLY DEFERRED
@@ -485,7 +485,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER MilestoneOnBeforeInsertOrUpdateTrigger2
+CREATE CONSTRAINT TRIGGER MilestoneOnAfterInsertOrUpdateTrigger2
 AFTER INSERT OR UPDATE
 ON Milestone
 DEFERRABLE INITIALLY DEFERRED
@@ -496,7 +496,7 @@ EXECUTE FUNCTION MilestoneCheckProjectDates();
 CREATE OR REPLACE FUNCTION TimeLogCheckAssignedDeveloper()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NOT EXISTS(
+    IF NOT EXISTS (
         SELECT 1
         FROM Task
         WHERE Task.taskId = NEW.task
@@ -508,12 +508,33 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE CONSTRAINT TRIGGER TimeLogOnBeforeInsertOrUpdateTrigger
+CREATE CONSTRAINT TRIGGER TimeLogOnAfterInsertOrUpdateTrigger
 AFTER INSERT OR UPDATE
 ON TimeLog
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION TimeLogCheckAssignedDeveloper();
+
+
+CREATE OR REPLACE FUNCTION CheckBugfixTaskAssignedDeveloper()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (
+        (NEW.taskId IN (SELECT taskId FROM BugfixTask WHERE impact = 'high')) AND
+        (NEW.assignedDeveloper IN (SELECT employeeId FROM JuniorDeveloper))
+    ) THEN
+        RAISE EXCEPTION 'Task %1 must be assigned to a Mid or Senior Developer', NEW.taskId;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger2
+AFTER INSERT OR UPDATE
+On Task
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION CheckBugfixTaskAssignedDeveloper();
 -- <<< External Constraints <<<
 
 
