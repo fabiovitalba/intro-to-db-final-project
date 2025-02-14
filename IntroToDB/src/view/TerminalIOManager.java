@@ -17,12 +17,23 @@ public class TerminalIOManager {
         return scanner.next();
     }
 
+    /**
+     * This function asks the user for an input. The input may be null or a number. Any other string that cannot be
+     * converted to a number, will return -1.
+     * @param valueQuestion Question to ask the user for the input.
+     * @return User input converted to integer
+     */
     public int askUserForInt(String valueQuestion) {
         System.out.println(valueQuestion);
         String scannerInput = scanner.next();
         if (scannerInput.equalsIgnoreCase("null"))
             return 0;
-        return Integer.parseInt(scannerInput); // might return null
+        try {
+            return Integer.parseInt(scannerInput);
+        } catch (NumberFormatException e) {
+            printError(scannerInput + " cannot be converted to a number.");
+            return -1;
+        }
     }
 
     public Date askUserForDate(String valueQuestion) {
@@ -72,15 +83,17 @@ public class TerminalIOManager {
         System.out.println();
     }
 
+    public static void printSuccess(String message) {
+        System.out.println("\033[0;1m\u001B[32m" + message + "\u001B[0m\n\n");
+    }
+
     public static void printError(String errorMessage) {
-        System.out.println("\u001B[31m" + errorMessage + "\u001B[0m");
+        System.out.println("\033[0;1m\u001B[31m" + errorMessage + "\u001B[0m\n\n");
     }
 
     public static void printErrorWithStackTrace(String errorMessage, Exception e) {
         //e.printStackTrace();
-        System.out.println("\u001B[31m" + errorMessage + " " + e.getMessage() + "\u001B[0m");
-        System.out.println();
-        System.out.println();
+        System.out.println("\033[0;1m\u001B[31m" + errorMessage + " " + e.getMessage() + "\u001B[0m\n\n");
     }
 
     public static void printResultSet(ResultSet resultSet) throws SQLException {
@@ -103,8 +116,7 @@ public class TerminalIOManager {
             }
             System.out.println("|");
         }
-        System.out.println("\u001B[0m");
-        System.out.println();
+        System.out.println("\u001B[0m\n\n");
     }
 
     private static String padTableCell(String cellValue, int width) {

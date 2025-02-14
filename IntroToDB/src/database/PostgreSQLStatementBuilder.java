@@ -171,7 +171,7 @@ public class PostgreSQLStatementBuilder {
 
     public static PreparedStatement getTaskListWithProgress(Connection conn) throws  SQLException {
         return conn.prepareStatement(
-            "SELECT TWP.taskId, TWP.description, D.name, TWP.dueDate, TWP.status, TWP.workedHrs, " +
+            "SELECT TWP.taskId, TWP.description, TWP.assignedDeveloper, D.name, TWP.dueDate, TWP.status, TWP.workedHrs, " +
                     "TWP.estimateHrs, TWP.progressPerc " +
                     "FROM ( " +
                         "SELECT T.taskId, T.description, T.assignedDeveloper, T.dueDate, T.status, " +

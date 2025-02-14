@@ -66,7 +66,7 @@ public class Main {
                         exitProgram = true;
                         break;
                     default:
-                        System.out.println("Selected activity does not exist. Please retry.");
+                        TerminalIOManager.printError("Selected activity does not exist. Please retry.");
                 }
             }
             conn.close();
@@ -86,6 +86,8 @@ public class Main {
     private static void createATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Create Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        if (taskId < 0)
+            return;
         String taskDesc = terminalIOManager.askUserForString("Description: ");
         String taskStatus = terminalIOManager.askUserForString("Status: ");
         Date dueDate = terminalIOManager.askUserForDate("Due Date (YYYY-MM-DD): ");
@@ -93,6 +95,8 @@ public class Main {
         String projectCode = terminalIOManager.askUserForString("Project code: ");
         String milestoneCode = terminalIOManager.askUserForString("Milestone code: ");
         int assignedDeveloperId = terminalIOManager.askUserForInt("Assigned Developer ID: ");
+        if (assignedDeveloperId < 0)
+            return;
         String taskType = terminalIOManager.askUserForString("Type (Bugfix, Feature, CodeReview):");
 
         try {
@@ -122,7 +126,7 @@ public class Main {
 
             conn.commit(); // commit transaction
             conn.setAutoCommit(true); // restore to default
-            System.out.println("Task was added!");
+            TerminalIOManager.printSuccess("Task was added!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -155,6 +159,8 @@ public class Main {
         }
 
         int taskId = terminalIOManager.askUserForInt("Task ID to release: ");
+        if (taskId < 0)
+            return;
 
         try {
             int taskIdColNo = resultSet.findColumn("taskId");
@@ -176,7 +182,7 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.releaseTask(conn, taskId, Date.valueOf(LocalDate.now()));
             preparedStatement.executeUpdate();
-            System.out.println("Task was released!");
+            TerminalIOManager.printSuccess("Task was released!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -185,12 +191,16 @@ public class Main {
     private static void assignATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Assign a Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        if (taskId < 0)
+            return;
         int developerId = terminalIOManager.askUserForInt("Developer ID: ");
+        if (developerId < 0)
+            return;
 
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.assignTask(conn, taskId, developerId);
             preparedStatement.executeUpdate();
-            System.out.println("Task was assigned!");
+            TerminalIOManager.printSuccess("Task was assigned!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -199,11 +209,13 @@ public class Main {
     private static void deleteTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Delete Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        if (taskId < 0)
+            return;
 
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.deleteTask(conn, taskId);
             preparedStatement.executeUpdate();
-            System.out.println("Task was deleted!");
+            TerminalIOManager.printSuccess("Task was deleted!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -244,7 +256,11 @@ public class Main {
     private static void assignAPeriodOfTimeActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Assign worked time to a Task of a Developer");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        if (taskId < 0)
+            return;
         int developerId = terminalIOManager.askUserForInt("Developer ID: ");
+        if (developerId < 0)
+            return;
         Date startDate = terminalIOManager.askUserForDate("Start Date: ");
         Time startTime = terminalIOManager.askUserForTime("Start Time: ");
         Date endDate = terminalIOManager.askUserForDate("End Date: ");
