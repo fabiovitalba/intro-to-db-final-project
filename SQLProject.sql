@@ -523,7 +523,7 @@ BEGIN
         (NEW.taskId IN (SELECT taskId FROM BugfixTask WHERE impact = 'high')) AND
         (NEW.assignedDeveloper IN (SELECT employeeId FROM JuniorDeveloper))
     ) THEN
-        RAISE EXCEPTION 'Task %1 must be assigned to a Mid or Senior Developer', NEW.taskId;
+        RAISE EXCEPTION 'Bugfix Task % must be assigned to a Mid or Senior Developer', NEW.taskId;
     END IF;
     RETURN NEW;
 END;
@@ -535,6 +535,70 @@ On Task
 DEFERRABLE INITIALLY DEFERRED
 FOR EACH ROW
 EXECUTE FUNCTION CheckBugfixTaskAssignedDeveloper();
+
+
+CREATE OR REPLACE FUNCTION CheckFeatureTaskAssignedDeveloper()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (
+        (NEW.taskId IN (SELECT taskId FROM FeatureTask WHERE complexity = 'high')) AND
+        (
+            (NEW.assignedDeveloper IN (SELECT employeeId FROM JuniorDeveloper)) OR
+            (NEW.assignedDeveloper IN (SELECT employeeId FROM MidDeveloper))
+        )
+    ) THEN
+        RAISE EXCEPTION 'Feature Task % must be assigned to a Senior Developer', NEW.taskId;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger3
+AFTER INSERT OR UPDATE
+On Task
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION CheckFeatureTaskAssignedDeveloper();
+
+
+CREATE OR REPLACE FUNCTION CheckAtMostThreeWorkableTasks()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (
+        (SELECT COUNT(taskId) FROM Task WHERE (assignedDeveloper = NEW.assignedDeveloper) AND (status in ('authorized','in progress'))) > 3
+    ) THEN
+        RAISE EXCEPTION 'Developer % already has 3 workable Tasks assigned.', NEW.assignedDeveloper;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER TaskOnAfterInsertOrUpdateTrigger4
+AFTER INSERT OR UPDATE
+On Task
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION CheckAtMostThreeWorkableTasks();
+
+
+CREATE OR REPLACE FUNCTION CheckTimeLogWithinCompletionDate()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (
+        (SELECT completionDate FROM Task WHERE taskId = NEW.task) < NEW.endingDate
+    ) THEN
+        RAISE EXCEPTION 'Ending Date % lies after Completion Date of Task %', NEW.endingDate, NEW.taskId;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER TimeLogOnAfterInsertOrUpdateTrigger2
+AFTER INSERT OR UPDATE
+On TimeLog
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION CheckTimeLogWithinCompletionDate();
 -- <<< External Constraints <<<
 
 
