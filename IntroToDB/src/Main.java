@@ -253,7 +253,7 @@ public class Main {
         LocalDateTime startDateTime = LocalDateTime.of(startDate.toLocalDate(), startTime.toLocalTime());
         LocalDateTime endDateTime = LocalDateTime.of(endDate.toLocalDate(), endTime.toLocalTime());
         Duration duration = Duration.between(startDateTime, endDateTime);
-        double hours = Math.round(duration.toSeconds() * 100.0 / 3600.0) / 100.0;
+        double hours = Math.round(duration.toSeconds() * 100.0 / 3600.0) / 100.0; // calculate Hours and round to two decimals
 
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.insertTimeLog(conn, taskId, developerId, startDate, startTime, endDate, endTime, hours);
