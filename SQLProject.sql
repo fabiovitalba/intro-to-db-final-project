@@ -605,7 +605,7 @@ BEGIN
     IF (
         (SELECT completionDate FROM Task WHERE taskId = NEW.task) < NEW.endingDate
     ) THEN
-        RAISE EXCEPTION 'Ending Date % lies after Completion Date of Task %', NEW.endingDate, NEW.taskId;
+        RAISE EXCEPTION 'Ending Date % lies after Completion Date of Task %', NEW.endingDate, NEW.task;
     END IF;
     RETURN NEW;
 END;
