@@ -106,21 +106,25 @@ public class Main {
                     taskId, taskDesc, taskStatus, dueDate, null, creationDate, null,
                     projectCode, milestoneCode, assignedDeveloperId);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
 
             switch (taskType.toLowerCase()) {
                 case "bugfix":
                     String impact = terminalIOManager.askUserForString("Impact (low, medium, high): ");
                     PreparedStatement bugfixPreparedStatement = PostgreSQLStatementBuilder.insertBugfixTask(conn, taskId, impact);
                     bugfixPreparedStatement.executeUpdate();
+                    bugfixPreparedStatement.close();
                     break;
                 case "feature":
                     String complexity = terminalIOManager.askUserForString("Complexity (low, medium, high): ");
                     PreparedStatement featurePreparedStatement = PostgreSQLStatementBuilder.insertFeatureTask(conn, taskId, complexity);
                     featurePreparedStatement.executeUpdate();
+                    featurePreparedStatement.close();
                     break;
                 case "codereview":
                     PreparedStatement codeReviewPrepStatement = PostgreSQLStatementBuilder.insertCodeReviewTask(conn, taskId);
                     codeReviewPrepStatement.executeUpdate();
+                    codeReviewPrepStatement.close();
                     break;
             }
 
@@ -128,7 +132,12 @@ public class Main {
             conn.setAutoCommit(true); // restore to default
             TerminalIOManager.printSuccess("Task was added!");
         } catch (SQLException e) {
+            try {
+                conn.rollback();
+                conn.setAutoCommit(true);
+            } catch (SQLException ignored) { }
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
+
         }
     }
 
@@ -144,8 +153,9 @@ public class Main {
         System.out.println("This is the list of unreleased Tasks:");
 
         ResultSet resultSet;
+        PreparedStatement tasksPreparedStatement;
         try {
-            PreparedStatement tasksPreparedStatement = PostgreSQLStatementBuilder.getUnreleasedTaskListStatement(conn);
+            tasksPreparedStatement = PostgreSQLStatementBuilder.getUnreleasedTaskListStatement(conn);
             resultSet = tasksPreparedStatement.executeQuery();
             if (!resultSet.first()) {
                 TerminalIOManager.printError("There are no unreleased Tasks to release.");
@@ -164,6 +174,7 @@ public class Main {
 
         try {
             boolean taskCanBeReleased = checkIfIntValueInResultSet(resultSet, "taskId", taskId);
+            tasksPreparedStatement.close();
             if (!taskCanBeReleased) {
                 TerminalIOManager.printError("Task " + taskId + " cannot be released.");
                 return;
@@ -176,6 +187,7 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.releaseTask(conn, taskId, Date.valueOf(LocalDate.now()));
             preparedStatement.executeUpdate();
+            preparedStatement.close();
             TerminalIOManager.printSuccess("Task was released!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
@@ -199,6 +211,7 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.assignTask(conn, taskId, developerId);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
             TerminalIOManager.printSuccess("Task was assigned!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
@@ -219,6 +232,7 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.deleteTask(conn, taskId);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
             TerminalIOManager.printSuccess("Task was deleted!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
@@ -238,6 +252,7 @@ public class Main {
                 PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksInProject(conn, projectCode, Date.valueOf(LocalDate.now()));
                 ResultSet resultSet = preparedStatement.executeQuery();
                 TerminalIOManager.printResultSet(resultSet);
+                preparedStatement.close();
             } catch (SQLException e) {
                 TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
             }
@@ -260,6 +275,7 @@ public class Main {
                 PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getOverdueTasksWithProgressInProject(conn, projectCode, Date.valueOf(LocalDate.now()));
                 ResultSet resultSet = preparedStatement.executeQuery();
                 TerminalIOManager.printResultSet(resultSet);
+                preparedStatement.close();
             } catch (SQLException e) {
                 TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
             }
@@ -294,6 +310,7 @@ public class Main {
         try {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.insertTimeLog(conn, taskId, developerId, startDate, startTime, endDate, endTime, hours);
             preparedStatement.executeUpdate();
+            preparedStatement.close();
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -312,6 +329,7 @@ public class Main {
                 PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getUnestimatedTasksForProject(conn, projectCode);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 TerminalIOManager.printResultSet(resultSet);
+                preparedStatement.close();
             } catch (SQLException e) {
                 TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
             }
@@ -330,6 +348,7 @@ public class Main {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getDeveloperWorkableTasksStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
             TerminalIOManager.printResultSet(resultSet);
+            preparedStatement.close();
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -345,6 +364,7 @@ public class Main {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getDeveloperListStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
             TerminalIOManager.printResultSet(resultSet);
+            preparedStatement.close();
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -360,6 +380,7 @@ public class Main {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getTaskListStatement(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
             TerminalIOManager.printResultSet(resultSet);
+            preparedStatement.close();
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -375,6 +396,7 @@ public class Main {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getTaskListWithProgress(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
             TerminalIOManager.printResultSet(resultSet);
+            preparedStatement.close();
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
@@ -390,6 +412,7 @@ public class Main {
             PreparedStatement preparedStatement = PostgreSQLStatementBuilder.getProjectWithMilestoneList(conn);
             ResultSet resultSet = preparedStatement.executeQuery();
             TerminalIOManager.printResultSet(resultSet);
+            preparedStatement.close();
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
