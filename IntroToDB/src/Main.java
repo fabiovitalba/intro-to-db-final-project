@@ -81,7 +81,7 @@ public class Main {
      * Allows the user to create new tasks. For date fields the user may input values using "today", "tomorrow",
      * or "yesterday" keywords for easier input.
      * @param conn Already established database connection
-     * @param terminalIOManager Object to handle Input/Output with Terminal
+     * @param terminalIOManager Object to handle Input with Terminal
      */
     private static void createATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Create Task");
@@ -137,7 +137,7 @@ public class Main {
      * The user then may choose one of the tasks of said list, and the task will be updated to status "authorized".
      * Additionally, the dateReleased is set automatically to the current date.
      * @param conn Already established database connection
-     * @param terminalIOManager Object to handle Input/Output with Terminal
+     * @param terminalIOManager Object to handle Input with Terminal
      */
     private static void releaseTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Release Task");
@@ -163,13 +163,7 @@ public class Main {
             return;
 
         try {
-            int taskIdColNo = resultSet.findColumn("taskId");
-            boolean taskCanBeReleased = false;
-            resultSet.beforeFirst(); // reset position
-            while(!taskCanBeReleased && resultSet.next()) {
-                if (resultSet.getInt(taskIdColNo) == taskId)
-                    taskCanBeReleased = true;
-            }
+            boolean taskCanBeReleased = checkIfIntValueInResultSet(resultSet, "taskId", taskId);
             if (!taskCanBeReleased) {
                 TerminalIOManager.printError("Task " + taskId + " cannot be released.");
                 return;
@@ -188,6 +182,11 @@ public class Main {
         }
     }
 
+    /**
+     * Allows the user to provide a Task and Developer, said Task is then assigned to provided Developer.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
     private static void assignATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Assign a Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
@@ -206,6 +205,11 @@ public class Main {
         }
     }
 
+    /**
+     * Allows the user to delete a Task.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
     private static void deleteTaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Delete Task");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
@@ -221,6 +225,11 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Tasks that are over their Due Date.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
     private static void findOverdueTasksActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Find overdue Tasks in a Project");
         String projectCode = terminalIOManager.askUserForString("Project code: ");
@@ -237,6 +246,12 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Tasks that are over their Due Date and displays their progress calculated by used hours compared to
+     * estimated hours.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
     private static void findOverdueTasksWithProgressActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Find overdue Tasks in a Project (with Progress)");
         String projectCode = terminalIOManager.askUserForString("Project code: ");
@@ -253,6 +268,11 @@ public class Main {
         }
     }
 
+    /**
+     * Assigns a period of time as worked time to a Task by a developer.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
     private static void assignAPeriodOfTimeActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Assign worked time to a Task of a Developer");
         int taskId = terminalIOManager.askUserForInt("Task ID: ");
@@ -279,6 +299,11 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Tasks without an estimate within a provided Project.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
     private static void findAllTaskWithoutEstimateActivity(Connection conn, TerminalIOManager terminalIOManager) {
         System.out.println("Selected: Find Tasks without an estimate in a Project");
         String projectCode = terminalIOManager.askUserForString("Project code: ");
@@ -295,6 +320,10 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Tasks in status "authorized" or "in progress", sorted by developer.
+     * @param conn Already established database connection
+     */
     private static void findAllAssignedWorkableTasksActivity(Connection conn) {
         System.out.println("Selected: List all workable Tasks per Developer");
         try {
@@ -306,6 +335,10 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Developers.
+     * @param conn Already established database connection
+     */
     private static void listAllDevelopersActivity(Connection conn) {
         System.out.println("Selected: List all Developers");
         try {
@@ -317,6 +350,10 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Tasks.
+     * @param conn Already established database connection
+     */
     private static void listAllTasksActivity(Connection conn) {
         System.out.println("Selected: List all Tasks");
         try {
@@ -328,6 +365,10 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Tasks with a progress % calculated based on the used hours compared to the estimated hours.
+     * @param conn Already established database connection
+     */
     private static void listAllTasksWProgressActivity(Connection conn) {
         System.out.println("Selected: List all Tasks (with progress)");
         try {
@@ -339,6 +380,10 @@ public class Main {
         }
     }
 
+    /**
+     * Lists all Milestones together with their Project's information. List is ordered by Project, Milestone.
+     * @param conn Already established database connection
+     */
     private static void listAllProjectsWithMilestonesActivity(Connection conn) {
         System.out.println("Selected: List all Projects (with Milestones)");
         try {
@@ -348,5 +393,24 @@ public class Main {
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or evaluated. Error:", e);
         }
+    }
+
+    /**
+     *
+     * @param resultSet Data to be searched, must be `TYPE_SCROLL_SENSITIVE`.
+     * @param columnLabel Label for the column in `resultSet` to be searched in.
+     * @param valueToSearch Value to be searched.
+     * @return `true` if `valueToSearch` is present in some field of column `columnLabel` within the `resultSet`. `false` otherwise.
+     * @throws SQLException In case provided `columnLabel` does not exist in `resultSet`.
+     */
+    private static boolean checkIfIntValueInResultSet(ResultSet resultSet, String columnLabel, int valueToSearch) throws SQLException {
+        int columnId = resultSet.findColumn(columnLabel);
+        boolean valueFound = false;
+        resultSet.beforeFirst(); // reset position
+        while(!valueFound && resultSet.next()) {
+            if (resultSet.getInt(columnId) == valueToSearch)
+                valueFound = true;
+        }
+        return valueFound;
     }
 }
