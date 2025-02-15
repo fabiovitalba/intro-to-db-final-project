@@ -20,8 +20,7 @@ public class Main {
             while(!exitProgram && conn.isValid(timeout)) {
                 System.out.println("Project Task management for IT Company.");
                 TerminalIOManager.printActivityMenu();
-                String selActivity = terminalIOManager.askUserForString("Please select the activity to perform:");
-                int activity = Integer.parseInt(selActivity);
+                int activity = terminalIOManager.askUserForInt("Please select the activity to perform:");
                 switch (activity) {
                     case 1:
                         createATaskActivity(conn, terminalIOManager);
@@ -64,6 +63,8 @@ public class Main {
                         break;
                     case 99:
                         exitProgram = true;
+                        break;
+                    case -1: // Conversion error
                         break;
                     default:
                         TerminalIOManager.printError("Selected activity does not exist. Please retry.");
