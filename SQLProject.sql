@@ -521,7 +521,7 @@ BEGIN
         (NEW.endingDate < NEW.startDate) OR
         ((NEW.endingDate = NEW.startDate) AND (NEW.endingTime < NEW.startTime))
     ) THEN
-        RAISE EXCEPTION 'End Date/Time (% %) lies before Start Date/Time (% %) in Time Log % %', NEW.endingDate, NEW.endingTime, NEW.startDate, NEW.startTime, NEW.task, NEW.developer;
+        RAISE EXCEPTION 'End Date/Time (% %) lies before Start Date/Time (% %) in Time Log % %.', NEW.endingDate, NEW.endingTime, NEW.startDate, NEW.startTime, NEW.task, NEW.developer;
     END IF;
     RETURN NEW;
 END;
@@ -541,7 +541,7 @@ BEGIN
         (NEW.taskId IN (SELECT taskId FROM BugfixTask WHERE impact = 'high')) AND
         (NEW.assignedDeveloper IN (SELECT employeeId FROM JuniorDeveloper))
     ) THEN
-        RAISE EXCEPTION 'Bugfix Task % must be assigned to a Mid or Senior Developer', NEW.taskId;
+        RAISE EXCEPTION 'Bugfix Task % must be assigned to a Mid or Senior Developer.', NEW.taskId;
     END IF;
     RETURN NEW;
 END;
@@ -565,7 +565,7 @@ BEGIN
             (NEW.assignedDeveloper IN (SELECT employeeId FROM MidDeveloper))
         )
     ) THEN
-        RAISE EXCEPTION 'Feature Task % must be assigned to a Senior Developer', NEW.taskId;
+        RAISE EXCEPTION 'Feature Task % must be assigned to a Senior Developer.', NEW.taskId;
     END IF;
     RETURN NEW;
 END;
@@ -605,7 +605,7 @@ BEGIN
     IF (
         (SELECT completionDate FROM Task WHERE taskId = NEW.task) < NEW.endingDate
     ) THEN
-        RAISE EXCEPTION 'Ending Date % lies after Completion Date of Task %', NEW.endingDate, NEW.task;
+        RAISE EXCEPTION 'Ending Date % lies after Completion Date of Task %.', NEW.endingDate, NEW.task;
     END IF;
     RETURN NEW;
 END;
