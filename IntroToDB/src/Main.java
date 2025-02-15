@@ -32,33 +32,36 @@ public class Main {
                         assignATaskActivity(conn, terminalIOManager);
                         break;
                     case 4:
-                        assignAPeriodOfTimeActivity(conn, terminalIOManager);
+                        estimateATaskActivity(conn, terminalIOManager);
                         break;
                     case 5:
-                        deleteTaskActivity(conn, terminalIOManager);
+                        assignAPeriodOfTimeActivity(conn, terminalIOManager);
                         break;
                     case 6:
-                        findOverdueTasksActivity(conn, terminalIOManager);
+                        deleteTaskActivity(conn, terminalIOManager);
                         break;
                     case 7:
-                        findOverdueTasksWithProgressActivity(conn, terminalIOManager);
+                        findOverdueTasksActivity(conn, terminalIOManager);
                         break;
                     case 8:
-                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
+                        findOverdueTasksWithProgressActivity(conn, terminalIOManager);
                         break;
                     case 9:
-                        findAllAssignedWorkableTasksActivity(conn);
+                        findAllTaskWithoutEstimateActivity(conn, terminalIOManager);
                         break;
                     case 10:
-                        listAllDevelopersActivity(conn);
+                        findAllAssignedWorkableTasksActivity(conn);
                         break;
                     case 11:
-                        listAllTasksActivity(conn);
+                        listAllDevelopersActivity(conn);
                         break;
                     case 12:
-                        listAllTasksWProgressActivity(conn);
+                        listAllTasksActivity(conn);
                         break;
                     case 13:
+                        listAllTasksWProgressActivity(conn);
+                        break;
+                    case 14:
                         listAllProjectsWithMilestonesActivity(conn);
                         break;
                     case 99:
@@ -214,6 +217,34 @@ public class Main {
             preparedStatement.executeUpdate();
             preparedStatement.close();
             TerminalIOManager.printSuccess("Task was assigned!");
+        } catch (SQLException e) {
+            TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
+        }
+    }
+
+    /**
+     * Allows the user to store the estimate of hours given by a developer on a task. The estimate is stored with the
+     * current date.
+     * @param conn Already established database connection
+     * @param terminalIOManager Object to handle Input with Terminal
+     */
+    private static void estimateATaskActivity(Connection conn, TerminalIOManager terminalIOManager) {
+        System.out.println("Selected: A Developer gives a time Estimate for a Task");
+        int taskId = terminalIOManager.askUserForInt("Task ID: ");
+        if (taskId < 0)
+            return;
+        int developerId = terminalIOManager.askUserForInt("Developer ID: ");
+        if (developerId < 0)
+            return;
+        int estimateInHrs = terminalIOManager.askUserForInt("Estimate (hours): ");
+        if (estimateInHrs < 0)
+            return;
+
+        try {
+            PreparedStatement preparedStatement = PostgreSQLStatementBuilder.estimateTask(conn, taskId, developerId, estimateInHrs, Date.valueOf(LocalDate.now()));
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+            TerminalIOManager.printSuccess("Task estimate assigned!");
         } catch (SQLException e) {
             TerminalIOManager.printErrorWithStackTrace("SQL Statement could not be prepared, or executed. Error:", e);
         }

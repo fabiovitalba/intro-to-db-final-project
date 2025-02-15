@@ -71,6 +71,17 @@ public class PostgreSQLStatementBuilder {
         return prepStmt;
     }
 
+    public static PreparedStatement estimateTask(Connection conn, int taskId, int developerId, int estimateInHrs, Date dateOfEstimate) throws SQLException {
+        PreparedStatement prepStmt = conn.prepareStatement(
+                "INSERT INTO Estimates VALUES (?, ?, ?, ?);"
+        );
+        prepStmt.setInt(1, taskId);
+        prepStmt.setInt(2, developerId);
+        prepStmt.setInt(3, estimateInHrs);
+        prepStmt.setDate(4, dateOfEstimate);
+        return prepStmt;
+    }
+
     public static PreparedStatement deleteTask(Connection conn, int taskId) throws SQLException {
         PreparedStatement prepStmt = conn.prepareStatement("DELETE FROM Task WHERE taskId = ?;");
         prepStmt.setInt(1, taskId);
