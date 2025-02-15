@@ -160,7 +160,7 @@ CREATE TABLE TimeLog(
     startTime TIME,
     endingDate DATE NOT NULL,
     endingTime TIME NOT NULL,
-    timeWorkedHrs DECIMAL NOT NULL,
+    timeWorkedHrs NUMERIC NOT NULL,
     PRIMARY KEY (developer, task, startDate, startTime),
     FOREIGN KEY (developer) REFERENCES Developer(employeeId)
         ON DELETE CASCADE
@@ -179,8 +179,8 @@ CREATE TABLE DueDateChange(
     oldDueDate DATE,
     newDueDate DATE,
     reason VARCHAR(100),
-    timeWorkedUntilNowHrs DECIMAL,
-    currentEstimateHrs DECIMAL,
+    timeWorkedUntilNowHrs NUMERIC,
+    currentEstimateHrs NUMERIC,
     PRIMARY KEY (developer, task, dateChanged, oldDueDate, newDueDate),
     FOREIGN KEY (developer) REFERENCES Developer(employeeId)
         ON DELETE CASCADE
@@ -656,10 +656,10 @@ BEGIN TRANSACTION;
 
     INSERT INTO Developer(employeeId, name, hiringDate, email, weeklyCapHrs) VALUES
         (1, 'Wolfram Eschenbach', '2018-01-15', 'wolfram.eschenbach@example.com', 40),
-        (2, 'Arthas Menethil', '2019-03-20', 'arthas.menethil@example.com', 32),
-        (3, 'Winnie Pooh', '2020-06-10', 'winnie.pooh@example.com', 24),
+        (2, 'Arthas Menethil', '2024-03-20', 'arthas.menethil@example.com', 32),
+        (3, 'Winnie Pooh', '2023-06-10', 'winnie.pooh@example.com', 24),
         (4, 'Christopher Robin', '2021-09-05', 'christopher.robin@example.com', 40),
-        (5, 'Geralt Of Rivia', '2022-01-10', 'geralt.rivia@example.com', 40);
+        (5, 'Geralt Of Rivia', '2015-01-10', 'geralt.rivia@example.com', 40);
 
     INSERT INTO Skill(name) VALUES
         ('JavaScript'),
