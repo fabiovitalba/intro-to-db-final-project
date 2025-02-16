@@ -356,6 +356,81 @@ EXECUTE FUNCTION SeniorDeveloperCheckDisjointness();
 
 
 
+-- >>> Inclusion Constraints >>>
+CREATE OR REPLACE FUNCTION CustomerCheckInclusion()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NOT (NEW.vatRegNo IN (SELECT customer FROM Orders)) THEN
+		RAISE EXCEPTION 'Customer inclusion constraint not fulfilled for %.', NEW.vatRegNo;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER CustomerOnAfterInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
+ON Customer
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION CustomerCheckInclusion();
+
+
+CREATE OR REPLACE FUNCTION DeveloperCheckInclusion()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NOT (NEW.employeeId IN (SELECT developer FROM HasSkill)) THEN
+		RAISE EXCEPTION 'Developer inclusion constraint not fulfilled for %.', NEW.employeeId;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER DeveloperOnAfterInsertOrUpdateTrigger2
+AFTER INSERT OR UPDATE
+ON Developer
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION DeveloperCheckInclusion();
+
+
+CREATE OR REPLACE FUNCTION LeadDeveloperCheckInclusion()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NOT (NEW.employeeId IN (SELECT leadDeveloper FROM TechLeads)) THEN
+		RAISE EXCEPTION 'Lead Developer inclusion constraint not fulfilled for %.', NEW.employeeId;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER LeadDeveloperOnAfterInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
+ON LeadDeveloper
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION LeadDeveloperCheckInclusion();
+
+
+CREATE OR REPLACE FUNCTION SkillCheckInclusion()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NOT (NEW.name IN (SELECT skill FROM HasSkill)) THEN
+		RAISE EXCEPTION 'Skill inclusion constraint not fulfilled for %.', NEW.name;
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER SkillOnAfterInsertOrUpdateTrigger
+AFTER INSERT OR UPDATE
+ON Skill
+DEFERRABLE INITIALLY DEFERRED
+FOR EACH ROW
+EXECUTE FUNCTION SkillCheckInclusion();
+-- <<< Inclusion Constraints <<<
+
+
+
 -- >>> Task Completeness Constraint >>>
 CREATE OR REPLACE FUNCTION TaskCheckCompleteness()
 RETURNS TRIGGER AS $$
