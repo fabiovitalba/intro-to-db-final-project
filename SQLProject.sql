@@ -361,7 +361,7 @@ CREATE OR REPLACE FUNCTION CustomerCheckInclusion()
 RETURNS TRIGGER AS $$
 BEGIN
 	IF NOT (NEW.vatRegNo IN (SELECT customer FROM Orders)) THEN
-		RAISE EXCEPTION 'Customer inclusion constraint not fulfilled for %.', NEW.vatRegNo;
+		RAISE EXCEPTION 'Customer inclusion constraint not fulfilled for %. Each Customer must be present in at least one Order.', NEW.vatRegNo;
 	END IF;
 	RETURN NEW;
 END;
@@ -379,7 +379,7 @@ CREATE OR REPLACE FUNCTION DeveloperCheckInclusion()
 RETURNS TRIGGER AS $$
 BEGIN
 	IF NOT (NEW.employeeId IN (SELECT developer FROM HasSkill)) THEN
-		RAISE EXCEPTION 'Developer inclusion constraint not fulfilled for %.', NEW.employeeId;
+		RAISE EXCEPTION 'Developer inclusion constraint not fulfilled for %. Each Developer must be assigned at least one Skill.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -397,7 +397,7 @@ CREATE OR REPLACE FUNCTION LeadDeveloperCheckInclusion()
 RETURNS TRIGGER AS $$
 BEGIN
 	IF NOT (NEW.employeeId IN (SELECT leadDeveloper FROM TechLeads)) THEN
-		RAISE EXCEPTION 'Lead Developer inclusion constraint not fulfilled for %.', NEW.employeeId;
+		RAISE EXCEPTION 'Lead Developer inclusion constraint not fulfilled for %. Each Lead Developer must be assigned at least one Project to lead.', NEW.employeeId;
 	END IF;
 	RETURN NEW;
 END;
@@ -415,7 +415,7 @@ CREATE OR REPLACE FUNCTION SkillCheckInclusion()
 RETURNS TRIGGER AS $$
 BEGIN
 	IF NOT (NEW.name IN (SELECT skill FROM HasSkill)) THEN
-		RAISE EXCEPTION 'Skill inclusion constraint not fulfilled for %.', NEW.name;
+		RAISE EXCEPTION 'Skill inclusion constraint not fulfilled for %. Each Skill must be assigned to at least one Developer.', NEW.name;
 	END IF;
 	RETURN NEW;
 END;
