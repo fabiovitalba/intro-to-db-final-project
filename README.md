@@ -9,8 +9,10 @@ This Project is divided into two parts:
 ## 1. Description
 The Project is described through the included documentation that you can find here:
 - [Project Specification (PDF)](./Documentation/IntroToDB-ProjectSpecification.pdf)
-- ![ER Diagram](./Documentation/IntroToDB-ProjectERDiagram.png)
-- ![Restructured ER Diagram](./Documentation/IntroToDB-ProjectRestructuredERDiagram.png)
+
+![ER Diagram](./Documentation/IntroToDB-ProjectERDiagram.png)
+
+![Restructured ER Diagram](./Documentation/IntroToDB-ProjectRestructuredERDiagram.png)
 
 ## 2. Visuals
 Here are some images of how the application looks like:
@@ -33,9 +35,9 @@ As you can see from the screenshots above, this application runs in the Terminal
 Follow the installation instructions and run the application locally.
 
 ## 5. Known issues
-- **Most inputs are not validated with the SQL Database:** This issue appears in almost all inputs, since most are just taken "as-is" and passed directly to the Query. This results in unwanted behaviour like:
+- **Most inputs are not validated before being passed to the SQL Database:** This issue appears in almost all inputs, since most are just taken "as-is" and passed directly to the Query. This results in unwanted behaviour like:
   - If you try to assign a non-existing Task, this will work --> An UPDATE is executed, which will update NO TUPLES, therefore the SQL statement is valid and throws no errors.
-- **SQL Database constraints are not updated:** After the project discussion on the 18.02.2025 I revisited the requirements and improved the constraints for the Restructured Schema. This led to the introduction of a few new constraints, that are now NOT REPRESENTED in the SQL file in this project.
+- **SQL Database constraints are not updated with latest specification:** After the project discussion on the 18.02.2025 I revisited the requirements and improved the constraints for the Restructured Schema. This led to the introduction of a few new constraints, that are now NOT REPRESENTED in the SQL file in this project.
 - **Task Restructuring required:** The Task Table contains many attributes and could probably be improved on. Some examples include:
   - Adding a constraint for completionDate to be `NOT NULL` whenever status = `'completed'`.
   - Adding a constraint for dateReleased to be `NOT NULL` whenever status != `not authorized`.
