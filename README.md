@@ -32,3 +32,11 @@ This application requires Java JDK, as well as a PostgreSQL Server running on yo
 As you can see from the screenshots above, this application runs in the Terminal.
 Follow the installation instructions and run the application locally.
 
+## 5. Known issues
+- **Most inputs are not validated with the SQL Database:** This issue appears in almost all inputs, since most are just taken "as-is" and passed directly to the Query. This results in unwanted behaviour like:
+  - If you try to assign a non-existing Task, this will work --> An UPDATE is executed, which will update NO TUPLES, therefore the SQL statement is valid and throws no errors.
+- **SQL Database constraints are not updated:** After the project discussion on the 18.02.2025 I revisited the requirements and improved the constraints for the Restructured Schema. This led to the introduction of a few new constraints, that are now NOT REPRESENTED in the SQL file in this project.
+- **Task Restructuring required:** The Task Table contains many attributes and could probably be improved on. Some examples include:
+  - Adding a constraint for completionDate to be `NOT NULL` whenever status = `'completed'`.
+  - Adding a constraint for dateReleased to be `NOT NULL` whenever status != `not authorized`.
+  - Vertical decomposition of `Task(taskId, description, status, dueDate, dateReleased*, creationDate, completionDate*, project, milestone, assignedDeveloper*)` into `Task(taskId, description status, dueDate, creationDate, project, milestone, assignedDeveloper*)` `TaskStatusDate(taskId,status,date)`. `TaskStatusDate` could then hold the tuple `(status='authorized',dateReleased)` for the release date, as well as the tuple `(status='completed',completionDate)` in order to reduce NULL values in Task and reduce its size. It could also be further optimized by also including the tuple `(status='not authorized',creationdate)` in order to remove another attribute that is rarely used in Task. This requires some restructuring of the Relational Schema, as well as the update of the SQL file in this project.
